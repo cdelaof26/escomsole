@@ -17,6 +17,7 @@ typedef struct str str;
 unsigned int len(const char * d);
 unsigned int initCopy(char ** dest, char * source);
 int initStrS(str * s, char * d);
+int initStrL(str * s, const unsigned int length);
 void unlinkStr(str * s);
 
 #endif //ESCOMSOLE_STR_H

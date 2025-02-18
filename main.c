@@ -6,7 +6,7 @@ void execute(str * line) {
     // To create a str you can use:
     //    str myString;
     //    initStrS(&myString, "Hello World!");
-    printf("%s\n", line -> text);
+    printf("Impresion de la cadena: %s", line -> text);
 }
 
 int executeFile(const char * path) {
@@ -26,10 +26,23 @@ int executeFile(const char * path) {
 int repl() {
     int exitCode = 0;
 
-    while (0 /* 1 */) {
-        // REPL logic here
+    str cadena;
+    initStrL(&cadena, 1000);
+
+    printf("Ingresa diferentes cadenas hasta que decidas terminar la ejecucion. (presiona CTRL + Z para salir): \n");
+
+    while (1) {
+        printf(">>>");
+        char *result = fgets(cadena.text, 1000, stdin);
+
+        if(result == NULL) {
+            break;
+        }
+
+        execute(&cadena);
     }
 
+    printf("Fin del programa... \n");
     return exitCode;
 }
 

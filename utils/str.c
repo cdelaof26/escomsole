@@ -68,3 +68,13 @@ void unlinkStr(str * s) {
     if (s -> text != NULL)
         free(s -> text);
 }
+
+int initStrL(str * s, const unsigned int length) {
+    s -> length = length;
+    s -> text = (char *) malloc(sizeof(char) * length);
+    int succeed = s->text != NULL;
+    if(succeed && length > 0)
+        s -> text[0] = '\0';
+
+    return succeed;}
+
