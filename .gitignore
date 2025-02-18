@@ -1,0 +1,9 @@
+
+# Directories
+.idea
+cmake-build-debug
+
+# Files
+CMakeLists.txt
+escomsole
+*.DS_Store
