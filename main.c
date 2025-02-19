@@ -14,8 +14,6 @@ int executeFile(const char * path) {
     if (f == NULL)
         return 1; // File not found
 
-    fclose(f);
-
     int exitCode = 0;
 
     // Execute file logic here
@@ -26,20 +24,19 @@ int executeFile(const char * path) {
 int repl() {
     int exitCode = 0;
 
-    str cadena;
-    initStrL(&cadena, 1000);
+    str string;
+    initStrL(&string, 1000);
 
     printf("Ingresa diferentes cadenas hasta que decidas terminar la ejecucion. (presiona CTRL + Z para salir): \n");
 
     while (1) {
-        printf(">>>");
-        char *result = fgets(cadena.text, 1000, stdin);
+        printf(">>> ");
+        char * result = fgets(string.text, 1000, stdin);
 
-        if(result == NULL) {
+        if(result == NULL)
             break;
-        }
 
-        execute(&cadena);
+        execute(&string);
     }
 
     printf("Fin del programa... \n");

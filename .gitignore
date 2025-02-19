@@ -7,3 +7,5 @@ cmake-build-debug
 CMakeLists.txt
 escomsole
 *.DS_Store
+a.exe
+repl.exe

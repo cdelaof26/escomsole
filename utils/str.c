@@ -69,12 +69,20 @@ void unlinkStr(str * s) {
         free(s -> text);
 }
 
+/**
+ * Initializes an string making it usable given an initial length.
+ * Do NOT use with initialized str, use unlinkStr(str *) instead.
+ *
+ * @param s the pointer
+ * @param length the new initial len
+ * @return 1 if succeed otherwise 0
+ */
 int initStrL(str * s, const unsigned int length) {
     s -> length = length;
     s -> text = (char *) malloc(sizeof(char) * length);
-    int succeed = s->text != NULL;
-    if(succeed && length > 0)
+    int succeed = s -> text != NULL;
+    if (succeed && length > 0)
         s -> text[0] = '\0';
 
-    return succeed;}
-
+    return succeed;
+}
