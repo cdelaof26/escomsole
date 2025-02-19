@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include "utils/str.h"
 
+#define ESCOMSOLE_VERSION "escomsole v0.0.2 (Feb 19 2025)"
+#define REPL_BUFFER_SIZE 1024
+
 void execute(str * line) {
     // This functions takes a str (struct) as parameter
     // To create a str you can use:
     //    str myString;
     //    initStrS(&myString, "Hello World!");
-    printf("Impresion de la cadena: %s", line -> text);
+    printf("Received data: %s", line -> text);
 }
 
 int executeFile(const char * path) {
@@ -16,7 +19,31 @@ int executeFile(const char * path) {
 
     int exitCode = 0;
 
-    // Execute file logic here
+    // char r;
+    int r; // fgetc returns an integer
+
+    // Instead of using a char array, use a str struct
+    // char words[1000];
+    str str1;
+    initStrL(&str1, 1);
+
+    while((r = fgetc(f)) != EOF) {
+        appendChar(&str1, (char) r);
+
+        if (r != '\n')
+            continue;
+
+        execute(&str1);
+        unlinkStr(&str1);
+        initStrL(&str1, 1);
+    }
+
+    // printf("%s", words);
+    // We need to check if the last line was executed. Unlink sets the length back to zero,
+    // but we're reinitializing the string back to 1
+    if (str1.length != 1)
+        execute(&str1);
+    unlinkStr(&str1);
 
     return exitCode;
 }
@@ -25,13 +52,13 @@ int repl() {
     int exitCode = 0;
 
     str string;
-    initStrL(&string, 1000);
+    initStrL(&string, REPL_BUFFER_SIZE);
 
-    printf("Ingresa diferentes cadenas hasta que decidas terminar la ejecucion. (presiona CTRL + Z para salir): \n");
+    printf("%s. Press CTRL + Z to exit.\n", ESCOMSOLE_VERSION);
 
     while (1) {
         printf(">>> ");
-        char * result = fgets(string.text, 1000, stdin);
+        char * result = fgets(string.text, REPL_BUFFER_SIZE, stdin);
 
         if(result == NULL)
             break;
@@ -39,7 +66,6 @@ int repl() {
         execute(&string);
     }
 
-    printf("Fin del programa... \n");
     return exitCode;
 }
 

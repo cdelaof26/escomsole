@@ -86,3 +86,28 @@ int initStrL(str * s, const unsigned int length) {
 
     return succeed;
 }
+
+/**
+ * Appends a character to the str
+ *
+ * @param s the string
+ * @param c the character to append
+ * @return 1 if succeed otherwise 0
+ */
+int appendChar(str * s, char c) {
+    // This handles a case in which a string might have space left (last index is not \0)
+    unsigned int stringEnd = 0;
+    if (s -> length > 0)
+        stringEnd = len(s -> text);
+
+    const unsigned int newLength = (stringEnd > s -> length ? s -> length : stringEnd) + 1;
+    char * tmp = (char *) realloc(s -> text, sizeof(char) * newLength);
+    if (tmp == NULL)
+        return 0;
+
+    tmp[newLength - 1] = c;
+    s -> length = newLength;
+    s -> text = tmp;
+
+    return 1;
+}
