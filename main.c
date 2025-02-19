@@ -19,6 +19,20 @@ int executeFile(const char * path) {
     int exitCode = 0;
 
     // Execute file logic here
+    char r;
+    char words[1000];
+    int i=0;
+    while((r = fgetc(f)) != EOF)
+    {
+        words[i++] = r;
+        if(r == '\n'){
+            words[i] = '\0';
+            printf("%s", words);
+            i = 0;
+        }
+        
+    }
+    printf("%s", words);
 
     return exitCode;
 }
@@ -61,3 +75,4 @@ int main(int argc, char const * argv[]) {
     printf("Usage:\n  %s : REPL mode\n  %s path/to/file : execute file\n", argv[0], argv[0]);
     return 1;
 }
+
