@@ -42,6 +42,22 @@ unsigned int initCopy(char ** dest, char * source) {
 }
 
 /**
+ * Copies source to dest. The shorter array determines how much data will be copied.
+ *
+ * @param dest the destination array
+ * @param destLength the length for the destination array
+ * @param source the source array
+ * @param sourceLength the length for the source array
+ */
+void copy(char * dest, unsigned int destLength, const char * source, unsigned int sourceLength) {
+    int i = 0;
+    for (; i < destLength && i < sourceLength; i++)
+        dest[i] = source[i];
+
+    dest[destLength - 1] = '\0';
+}
+
+/**
  * Initializes an string making it usable given a initial char array,
  * the char array will be copied.
  * Do NOT use with initialized str, use unlinkStr(str *) instead.
@@ -106,6 +122,27 @@ int appendChar(str * s, char c) {
         return 0;
 
     tmp[newLength - 1] = c;
+    s -> length = newLength;
+    s -> text = tmp;
+
+    return 1;
+}
+
+/**
+ * Appends a char array to a str
+ *
+ * @param s the string
+ * @param array the char array to append
+ * @return 1 if succeed otherwise 0
+ */
+int appendCharArray(str * s, char * array) {
+    const unsigned int arrayLength = len(array);
+    const unsigned int newLength = s -> length + arrayLength;
+    char * tmp = (char *) realloc(s -> text, sizeof(char) * newLength);
+    if (tmp == NULL)
+        return 0;
+
+    copy(tmp + s -> length, newLength, array, arrayLength);
     s -> length = newLength;
     s -> text = tmp;
 

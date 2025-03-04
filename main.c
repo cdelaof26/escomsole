@@ -70,10 +70,10 @@ int repl() {
 }
 
 int main(int argc, char const * argv[]) {
-    if (argc == 1)
+    if (argc == 1) // No user provided arguments
         return repl();
 
-    if (argc == 2) {
+    if (argc == 2) { // One user provided argument
         int status = executeFile(argv[1]);
         if (status == 1)
             printf("File '%s' not found\n", argv[1]);
@@ -81,6 +81,7 @@ int main(int argc, char const * argv[]) {
         return status;
     }
 
-    printf("Usage:\n  %s : REPL mode\n  %s path/to/file : execute file\n", argv[0], argv[0]);
+    // Two or more user provided arguments
+    fprintf(stderr, "Usage:\n  %s : REPL mode\n  %s path/to/file : execute file\n", argv[0], argv[0]);
     return 1;
 }
