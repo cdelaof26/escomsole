@@ -58,6 +58,27 @@ void copy(char * dest, unsigned int destLength, const char * source, unsigned in
 }
 
 /**
+ * Compares the contents in two char arrays.
+ * Note: This is case sensitive
+ *
+ * @param s1 the first array
+ * @param s1Length the length for s1
+ * @param s2 the second array
+ * @param s2Length the length for s2
+ * @return 1 if equal otherwise 0
+ */
+int equalCharArrayCS(const char * s1, unsigned int s1Length, const char * s2, unsigned int s2Length) {
+    if (s1Length != s2Length)
+        return 0;
+
+    for (int i = 0; i < s1Length; i++)
+        if (s1[i] != s2[i])
+            return 0;
+
+    return 1;
+}
+
+/**
  * Initializes an string making it usable given a initial char array,
  * the char array will be copied.
  * Do NOT use with initialized str, use unlinkStr(str *) instead.

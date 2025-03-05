@@ -1,0 +1,18 @@
+/*
+    This is a sample code for the
+    escomsole interpreter written
+    in C.
+*/
+
+var myBooleanVar = true;
+var myVar = 8;
+var myVar2 = 30;
+var comparison = myVar >= myVar2;
+var notComparison = !comparison;
+
+var myArray = [];
+
+myVar++;
+
+print myVar and myBooleanVar;
+print myBooleanVar ? myVar : myVar2;

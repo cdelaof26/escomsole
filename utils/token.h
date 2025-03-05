@@ -18,6 +18,7 @@ struct Token {
 
 typedef struct Token Token;
 
+int initEOFToken(Token * token);
 void initToken(Token * token, TOKEN_TYPE type, unsigned int line);
 int initTokenN(Token * token, TOKEN_TYPE type, char * lexeme, unsigned int line);
 int initTokenL(Token * token, TOKEN_TYPE type, char * lexeme, char * literal, unsigned int line);

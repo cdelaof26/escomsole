@@ -9,7 +9,7 @@ REPL written in C
 ### Compile
 
 ```bash
-gcc main.c utils/*.c -o escomsole
+gcc main.c utils/*.c analyser/*.c -o escomsole
 ```
 
 ### Usage

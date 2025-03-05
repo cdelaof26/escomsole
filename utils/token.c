@@ -6,6 +6,18 @@
 #include <stdio.h>
 
 /**
+ * Initializes a token struct as EOF
+ * @param token the token
+ * @return 1 if success otherwise 0
+ */
+int initEOFToken(Token * token) {
+    token -> type = ESC_EOF;
+    token -> line = -1;
+    token -> literal.text = NULL;
+    return initStrS(&(token -> lexeme), "$");
+}
+
+/**
  * Initializes a token struct given a type and a lexeme
  * @param token the token
  * @param type the type
@@ -30,8 +42,8 @@ int initTokenN(Token * token, TOKEN_TYPE type, char * lexeme, unsigned int line)
     token -> type = type;
     token -> line = line;
     token -> literal.text = NULL;
-    int successStrInit = initStrS(&token -> lexeme, lexeme);
-    return !successStrInit;
+    int successStrInit = initStrS(&(token -> lexeme), lexeme);
+    return successStrInit;
 }
 
 /**
@@ -63,9 +75,6 @@ str tokenToString(Token * token) {
     if (!initStrS(&tokenStr, "<"))
         return tokenStr;
 
-    if (!literalTokenInitialized)
-        initLiteralTokenType();
-
     appendCharArray(&tokenStr, LITERAL_TOKEN_TYPE[token -> type]);
 
     if (token -> lexeme.text != NULL) {
@@ -78,11 +87,13 @@ str tokenToString(Token * token) {
         appendCharArray(&tokenStr, token -> literal.text);
     }
 
-    appendCharArray(&tokenStr, ", Line: ");
+    if (token -> line != -1) { // EOF doesn't have line specified
+        appendCharArray(&tokenStr, ", Line: ");
 
-    char charLine[10];
-    sprintf(charLine, "%d", token -> line);
-    appendCharArray(&tokenStr, charLine);
+        char charLine[10];
+        sprintf(charLine, "%d", token -> line);
+        appendCharArray(&tokenStr, charLine);
+    }
 
     appendChar(&tokenStr, '>');
 

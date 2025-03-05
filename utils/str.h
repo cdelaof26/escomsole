@@ -17,6 +17,7 @@ typedef struct str str;
 unsigned int len(const char * d);
 unsigned int initCopy(char ** dest, char * source);
 void copy(char * dest, unsigned int destLength, const char * source, unsigned int sourceLength);
+int equalCharArrayCS(const char * s1, unsigned int s1Length, const char * s2, unsigned int s2Length);
 int initStrS(str * s, char * d);
 int initStrL(str * s, unsigned int length);
 int appendChar(str * s, char c);

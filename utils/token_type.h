@@ -5,6 +5,9 @@
 #ifndef ESCOMSOLE_TOKEN_TYPE_H
 #define ESCOMSOLE_TOKEN_TYPE_H
 
+#include <stdio.h>
+#include "../utils/str.h"
+
 enum token_type {
     // ESC_ stands for ESCOMSOLE, this is needed as some identifiers are defined in C, such as NULL or EOF
 
@@ -30,8 +33,10 @@ enum token_type {
 
 typedef enum token_type TOKEN_TYPE;
 
-extern int literalTokenInitialized;
-char ** LITERAL_TOKEN_TYPE;
-void initLiteralTokenType();
+extern int TOTAL_RESERVED_WORDS;
+extern char * LITERAL_TOKEN_TYPE[];
+extern char * RESERVED_WORDS[];
+
+int isReservedWord(str * data);
 
 #endif //ESCOMSOLE_TOKEN_TYPE_H
