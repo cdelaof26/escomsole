@@ -1,14 +1,15 @@
 /*
-    This is a sample code for the
+    This is a sample snippet for the
     escomsole interpreter written
     in C.
 */
 
 var myBooleanVar = true;
-var myVar = 8;
+var myVar = 8.61;
 var myVar2 = 30;
+var myVar3 = 9E-10;
 var comparison = myVar >= myVar2;
-var notComparison = !comparison;
+var notComparison = !comparison; // Single line comment
 
 var myArray = [];
 

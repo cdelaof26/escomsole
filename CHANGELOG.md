@@ -1,5 +1,8 @@
 ## Version history
 
+### v0.0.4pre
+- Language transition from C to Java
+
 ### v0.0.3pre
 - Lexical analyzer
 

@@ -1,22 +1,21 @@
 # escomsole
 
-REPL written in C
+REPL written in Java FTW
 
 ### Requirements
-- C17
-- A C compiler
+- Java 8 or newer
 
 ### Compile
 
 ```bash
-gcc main.c utils/*.c analyser/*.c -o escomsole
+javac escomsoleje/EscomsoleJE.java
 ```
 
 ### Usage
 ```bash
 # REPL mode
-./escomsole
+java escomsoleje/escomsole
 
 # Execute file
-./escomsole path/to/file
+java escomsoleje/escomsole path/to/file
 ```
