@@ -12,8 +12,13 @@ var comparison = myVar >= myVar2;
 var notComparison = !comparison; // Single line comment
 
 var myArray = [];
+print myArray[10];
 
 myVar++;
+myVar2--;
+
+myVar += 12;
+myVar2 *= 9.9;
 
 print myVar and myBooleanVar;
 print myBooleanVar ? myVar : myVar2;

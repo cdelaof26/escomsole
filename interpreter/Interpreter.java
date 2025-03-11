@@ -14,26 +14,26 @@ import java.util.logging.Logger;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4pre (Mar 06 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3-2pre (Mar 10 2025)";
     
     private static int prevState = 0;
     
     /**
      * Given a code line, this function analyses it then executes it
      * 
-     * @param code the code to run
-     * @param fileLine the specific code of text in the file
+     * @param codeSnippet the code to run
+     * @param lineNumber the line number in the file
      * @return the status code
      */
-    public static int execute(String code, int fileLine) {
-        if (!code.endsWith("\n")) // The automaton requires to know if there's a \n for some cases
-            code += "\n";
+    public static int execute(String codeSnippet, int lineNumber) {
+        if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n for some cases
+            codeSnippet += "\n";
         
         // System.out.println("Received data: " + code); // Debug
 
         int previousTotalTokens = LexicalScanner.tokens.size();
         int status = Status.SCAN_SUCCESS;
-        prevState = LexicalScanner.scan(code, fileLine, prevState);
+        prevState = LexicalScanner.scan(codeSnippet, lineNumber, prevState);
 
         if (Status.isError(prevState))
             status = prevState;
@@ -46,34 +46,35 @@ public class Interpreter {
     
     /**
      * Given a file path, this function runs all the code within.
-     * @param path the path
+     * @param filePath the path
      * @return the status exit code
      */
-    public static int executeFile(String path) {
-        File f = new File(path);
+    public static int executeFile(String filePath) {
+        File f = new File(filePath);
         if (!f.exists())
             return Status.FILE_NOT_FOUND; // File not found
 
         int exitCode = Status.RUN_SUCCESS;
-        int line = 1;
-        String str1;
+        int lineNumber = 1;
+        String fileLine;
         
         // This notation is called try-with-resources, there's no need to 
         // open/close whatever resource we are accessing
         //
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             while (true) {
-                str1 = br.readLine();
-                if (str1 == null)
+                fileLine = br.readLine();
+                if (fileLine == null)
                     break;
 
-                exitCode = execute(str1, line);
-                line++;
+                exitCode = execute(fileLine, lineNumber);
                 if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
-                    printError(str1, line, exitCode);
+                    printError(fileLine, lineNumber, exitCode);
                     break;
                 }
+                
+                lineNumber++;
             }
         } catch (FileNotFoundException ex) { 
             Logger.getLogger(Interpreter.class.getName()).log(Level.SEVERE, null, ex);
@@ -90,24 +91,26 @@ public class Interpreter {
      */
     public static int repl() {
         int exitCode = Status.RUN_SUCCESS;
-        int line = 1;
+        int lineNumber = 1;
         
         System.out.println(ESCOMSOLE_VERSION + ". Press CTRL + Z to exit.");
-        String str1;
+        String fileLine;
         
         try (Scanner s = new Scanner(System.in)) {
-            System.out.print(">>> ");
-            while (s.hasNext()) {
-                str1 = s.nextLine();
-                exitCode = execute(str1, line);
+            while (true) {
                 System.out.print(">>> ");
-                line++;
+                fileLine = s.nextLine();
+                if (fileLine == null || fileLine.isEmpty())
+                    break;
+                
+                exitCode = execute(fileLine, lineNumber);
                 if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
-                    printError(str1, line, exitCode);
-                    break;
+                    printError(fileLine, lineNumber, exitCode);
                 }
-            };
+                
+                lineNumber++;
+            }
         }
 
         return exitCode;

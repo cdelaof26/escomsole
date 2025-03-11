@@ -8,14 +8,14 @@ REPL written in Java FTW
 ### Compile
 
 ```bash
-javac escomsoleje/EscomsoleJE.java
+javac -cp . escomsoleje/EscomsoleJE.java
 ```
 
 ### Usage
 ```bash
 # REPL mode
-java escomsoleje/escomsole
+java escomsoleje/EscomsoleJE
 
 # Execute file
-java escomsoleje/escomsole path/to/file
+java escomsoleje/EscomsoleJE path/to/file
 ```
