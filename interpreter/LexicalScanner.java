@@ -15,13 +15,7 @@ public class LexicalScanner {
     };
 
     private static final ArrayList<Character> SYMBOLS = new ArrayList<>();
-    private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList() {
-        @Override
-        public int indexOf(Object o) {
-            return super.indexOf(o);
-        }
-        
-    };
+    private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList();
 
     static {
         SYMBOLS.add('(');
