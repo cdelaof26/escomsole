@@ -123,9 +123,13 @@ public class Interpreter {
             case Status.MALFORMED_NUMBER:
                 data = "A number is malformed. Near";
             break;
+            case Status.STRING_CHARTER_INVALID:
+                data = "Error to trust create a string. Near";
+            break;
             default: // SYNTAX ERROR
                 data = "Invalid syntax. Near";
             break;
+
         }
 
         System.err.println(String.format("%s\n    %s\nin line %d\n", data, line, fileLine));
