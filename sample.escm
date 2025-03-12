@@ -4,6 +4,8 @@
     in C.
 */
 
+print "Script start";
+
 var myBooleanVar = true;
 var myVar = 8.61;
 var myVar2 = 30;

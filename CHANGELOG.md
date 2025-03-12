@@ -1,5 +1,11 @@
 ## Version history
 
+### v0.0.3
+- Operator analyzer
+- String analyzer
+- Fixed string espaping
+- Improved error printer
+
 ### v0.0.3-2pre
 - Language transition from C to Java
 - Number analyzer

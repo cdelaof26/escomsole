@@ -5,16 +5,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import modeling.Token;
+import modeling.TokenType;
 
 /**
  *
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3-2pre (Mar 10 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3 (Mar 12 2025)";
     
     private static int prevState = 0;
     
@@ -26,7 +29,14 @@ public class Interpreter {
      * @return the status code
      */
     public static int execute(String codeSnippet, int lineNumber) {
-        if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n for some cases
+        if (codeSnippet == null) {
+            LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
+            System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
+            
+            return Status.SCAN_EOF;
+        }
+        
+        if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n in some cases
             codeSnippet += "\n";
         
         // System.out.println("Received data: " + code); // Debug
@@ -58,17 +68,21 @@ public class Interpreter {
         int lineNumber = 1;
         String fileLine;
         
-        // This notation is called try-with-resources, there's no need to 
+        // This notation is called try-with-resources, there's no need to manually
         // open/close whatever resource we are accessing
         //
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             while (true) {
                 fileLine = br.readLine();
-                if (fileLine == null)
-                    break;
+//                if (fileLine == null)
+//                    break;
 
                 exitCode = execute(fileLine, lineNumber);
-                if (exitCode != 0) {
+                
+                if (exitCode == Status.SCAN_EOF) {
+                    exitCode = Status.RUN_SUCCESS;
+                    break;
+                } if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
                     printError(fileLine, lineNumber, exitCode);
                     break;
@@ -99,17 +113,27 @@ public class Interpreter {
         try (Scanner s = new Scanner(System.in)) {
             while (true) {
                 System.out.print(">>> ");
-                fileLine = s.nextLine();
-                if (fileLine == null || fileLine.isEmpty())
-                    break;
                 
-                exitCode = execute(fileLine, lineNumber);
-                if (exitCode != 0) {
-                    // System.err.println("error " + exitCode); // Debug
-                    printError(fileLine, lineNumber, exitCode);
+                try {
+                    fileLine = s.nextLine();
+                } catch (NoSuchElementException e) {
+                    System.out.println();
+                    fileLine = null;
                 }
                 
-                lineNumber++;
+                if (fileLine == null || fileLine.isEmpty())
+                    fileLine = null;
+                
+                exitCode = execute(fileLine, lineNumber);
+                
+                if (exitCode == Status.SCAN_EOF) {
+                    exitCode = Status.RUN_SUCCESS;
+                    break;
+                } else if (exitCode != 0) {
+                    // System.err.println("error " + exitCode); // Debug
+                    printError(fileLine, lineNumber, exitCode);
+                } else
+                    lineNumber++;
             }
         }
 
@@ -121,17 +145,30 @@ public class Interpreter {
 
         switch (errorCode) {
             case Status.MALFORMED_NUMBER:
-                data = "A number is malformed. Near";
+                data = "A number is malformed";
             break;
-            case Status.STRING_CHARTER_INVALID:
-                data = "Error to trust create a string. Near";
+            case Status.INVALID_STRING:
+                data = "Unterminated string literal";
             break;
             default: // SYNTAX ERROR
-                data = "Invalid syntax. Near";
+                data = "Invalid syntax";
             break;
-
         }
+        
+        String strFileLine = "" + fileLine;
+        data += " in line " + strFileLine;
+        
+        String marker = "  ";
+        for (int i = 0; i < strFileLine.length(); i++)
+            marker += " ";
 
-        System.err.println(String.format("%s\n    %s\nin line %d\n", data, line, fileLine));
+        marker += "----";
+        
+        for (int i = 0; i < LexicalScanner.scanIndex - 1; i++)
+            marker += "-";
+        
+        marker += "^";
+        
+        System.err.println(String.format("%s\n  %s    %s\n%s", data, strFileLine, line, marker));
     }
 }
