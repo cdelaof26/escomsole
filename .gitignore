@@ -1,6 +1,7 @@
 
 # Directories
 .idea
+out
 cmake-build-debug
 
 # Files
@@ -10,4 +11,5 @@ escomsole
 a.exe
 repl.exe
 escomsole.exe
+escomsole.iml
 *.class

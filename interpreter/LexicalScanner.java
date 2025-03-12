@@ -13,7 +13,46 @@ public class LexicalScanner {
         "and", "else", "false", "fun", "for", "if", "null", "or",
         "print", "return", "true", "var", "while"
     };
-    
+
+    private static final ArrayList<Character> SYMBOLS = new ArrayList<>();
+    private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList() {
+        @Override
+        public int indexOf(Object o) {
+            return super.indexOf(o);
+        }
+        
+    };
+
+    static {
+        SYMBOLS.add('(');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_LEFT_PAREN);
+        SYMBOLS.add(')');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_RIGHT_PAREN);
+        
+        SYMBOLS.add('{');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_LEFT_BRACE);
+        SYMBOLS.add('}');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_RIGHT_BRACE);
+        
+        SYMBOLS.add('[');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_LEFT_BRACKET);
+        SYMBOLS.add(']');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_RIGHT_BRACKET);
+        
+        
+        SYMBOLS.add('.');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_DOT);
+        SYMBOLS.add(',');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_COMMA);
+        SYMBOLS.add(':');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_COLON);
+        SYMBOLS.add(';');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_SEMICOLON);
+        
+        SYMBOLS.add('?');
+        SYMBOLS_TOKEN_TYPES.add(TokenType.ESC_QUESTION_MARK);
+    }
+
     public static ArrayList<Token> tokens = new ArrayList<>();
     
     private static TokenType getTokenType(String data) {
@@ -47,14 +86,14 @@ public class LexicalScanner {
              *  - Comment analyser : DONE
              *  - Identifiers and reserved words analyser : DONE
              *  - Operators analyser
-             *  - Punctuation analyser
+             *  - Punctuation analyser : DONE
              *  - Number analyser: this may require an evaluation function ; DONE
              *  - String analyser
              *  - Handle error
              *  - Extra automata
              *      - ++, --
-             *      - Ternary operation
-             *      - Array bracket notation
+             *      - Ternary operation : DONE ('?' and ':')
+             *      - Array bracket notation : DONE ('[' and ']')
              */
 
             // System.out.println(c + " : state " + state); // Debug
@@ -70,12 +109,17 @@ public class LexicalScanner {
                     } else if (c == '/') { // Comments
                         state = 24;
                         lexeme += c;
-                    } else if (Character.isWhitespace(c)) {
-                        // handle delimiters
+                    } else if (SYMBOLS.contains(c)){ // Punctuation marks
+                        TokenType to = SYMBOLS_TOKEN_TYPES.get(SYMBOLS.indexOf(c));
+
+                        Token t = new Token(to, lineNumber);
+                        tokens.add(t);
                     } else {
-                        System.out.println("Unknown char c = '" + c + "' state 0");
-                        // TODO: Uncomment in completion
-                        // return Status.SYNTAX_ERROR;
+                        if (!Character.isWhitespace(c)) {
+                            System.out.println("Unknown char c = '" + c + "' state 0");
+                            // TODO: Uncomment in completion
+                            // return Status.SYNTAX_ERROR;
+                        }
                     }
                 break;
                 
