@@ -108,6 +108,30 @@ public class LexicalScanner {
 
                         Token t = new Token(to, lineNumber);
                         tokens.add(t);
+                    } else if (c == '+') {
+                        state = 1;
+                        lexeme += c;
+                    }else if (c == '-') {
+                        state = 6;
+                        lexeme += c;
+                    }else if (c == '*') {
+                        state = 5;
+                        lexeme += c;
+                    }else if (c == '"') {
+                        state = 43;
+                        lexeme += c;
+                    }else if (c == '<') {
+                        state = 32;
+                        lexeme += c;
+                    }else if (c == '>') {
+                        state = 36;
+                        lexeme += c;
+                    }else if (c == '=') {
+                        state = 41;
+                        lexeme += c;
+                    }else if (c == '!') {
+                        state = 38;
+                        lexeme += c;
                     } else {
                         if (!Character.isWhitespace(c)) {
                             System.out.println("Unknown char c = '" + c + "' state 0");
@@ -117,6 +141,63 @@ public class LexicalScanner {
                     }
                 break;
                 
+                case 1:
+                    if(c == '=') {
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_PLUS_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else if(c == '+') {
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_PLUS_PLUS, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else{
+                        Token t = new Token(TokenType.ESC_PLUS, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--;
+                    }
+                    break;
+                case 5:
+                    if (c == '=') {
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_STAR_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else {
+                        Token t = new Token(TokenType.ESC_STAR, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--;
+                    }
+                    break;
+                case 6:
+                    if (c == '-') {
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_MINUS_MINUS, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else if(c == '='){
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_MINUS_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else {
+                        Token t = new Token(TokenType.ESC_MINUS, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--;
+                    }
+                    break;
                 case 13:
                     if (Character.isLetterOrDigit(c)) { // IDENTIFIERS and reserved words
                         lexeme += c;
@@ -211,7 +292,13 @@ public class LexicalScanner {
                     } else if (c == '/') {
                         state = 28;
                         lexeme = "";
-                    } else { // state 30
+                    } else if (c == '=') {
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_SLASH_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                    }else { // state 30
                         tokens.add(new Token(TokenType.ESC_SLASH, lineNumber));
                         lexeme = "";
                         state = 0;
@@ -238,6 +325,93 @@ public class LexicalScanner {
                         state = 28;
                     else
                         state = 0;
+                break;
+                case 32:
+                    if(c == '='){
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_LESS_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0; 
+                    }else{
+                        Token t = new Token(TokenType.ESC_LESS, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--; 
+                    }
+                break;
+                case 36:
+                    if(c == '='){
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_GREATER_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0; 
+                    }else{
+                        Token t = new Token(TokenType.ESC_GREATER, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--; 
+                    }
+                break;
+                case 38:
+                if(c == '='){
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_NOT_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0; 
+                    }else{
+                        Token t = new Token(TokenType.ESC_NOT, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--; 
+                    }
+                break;
+                case 41:
+                if(c == '='){
+                        lexeme += c;
+                        Token t = new Token(TokenType.ESC_EQUAL_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0; 
+                    }else{
+                        Token t = new Token(TokenType.ESC_EQUAL, lineNumber);
+                        tokens.add(t);
+                        lexeme = "";
+                        state = 0;
+                        i--; 
+                    }
+                break;
+                case 43:
+                    if (c == '\n'){
+                        return Status.STRING_CHARTER_INVALID;
+                    }else if (c == '\\') {
+                        state = 59;
+                        lexeme += c;
+                    }else if(c == '"'){
+                        String s = "";
+                        s = lexeme.substring(1);
+                        s = s.replace("\\n", "\n");
+                        s = s.replace("\\n", "\t"); 
+                        s = s.replace("\\\"", "\"");
+                        lexeme += c; 
+                        Token t = new Token (TokenType.ESC_STRING,lexeme, s, lineNumber);
+                        tokens.add(t);
+                        state = 0;
+                        lexeme = "";
+                    }else{
+                        lexeme += c;
+                    }
+                break;
+                case 59:
+                    if (c == '\"') {
+                        lexeme += c;
+                        state = 43;
+                    }
                 break;
 
                 default:
