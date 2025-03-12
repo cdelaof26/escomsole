@@ -13,7 +13,26 @@ public class LexicalScanner {
         "and", "else", "false", "fun", "for", "if", "null", "or",
         "print", "return", "true", "var", "while"
     };
-    
+
+    static ArrayList<String> simbolos;
+    static ArrayList<TokenType> tokenTypes;
+
+    static {
+         simbolos = new ArrayList<>();
+         tokenTypes = new ArrayList<>();
+
+         String []simb = new String[]{"(", ")", "{", "}", ".", ";", "[", "]", "?", ":", ","};
+         TokenType []tok = new TokenType[]{TokenType.ESC_LEFT_PAREN, TokenType.ESC_RIGHT_PAREN, TokenType.ESC_LEFT_BRACE, TokenType.ESC_RIGHT_BRACE, TokenType.ESC_DOT, TokenType.ESC_SEMICOLON, TokenType.ESC_LEFT_BRACKET, TokenType.ESC_RIGHT_BRACKET, TokenType.ESC_QUESTION_MARK, TokenType.ESC_COLON, TokenType.ESC_COMMA};
+
+        for(TokenType co : tok) {
+            tokenTypes.add(co);
+        }
+
+         for(String count : simb) {
+         simbolos.add(count);
+         }
+    }
+
     public static ArrayList<Token> tokens = new ArrayList<>();
     
     private static TokenType getTokenType(String data) {
@@ -72,7 +91,13 @@ public class LexicalScanner {
                         lexeme += c;
                     } else if (Character.isWhitespace(c)) {
                         // handle delimiters
-                    } else {
+                    }
+                    else if (simbolos.contains(c + "")){
+                        TokenType to = tokenTypes.get(simbolos.indexOf(c + ""));
+
+                        Token t = new Token(to, lineNumber);
+                        tokens.add(t);
+                } else {
                         System.out.println("Unknown char c = '" + c + "' state 0");
                         // TODO: Uncomment in completion
                         // return Status.SYNTAX_ERROR;
