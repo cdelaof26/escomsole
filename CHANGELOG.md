@@ -1,10 +1,10 @@
 ## Version history
 
-### v0.0.3
+### v0.0.3-1
 - Operator analyzer
 - String analyzer
-- Fixed string espaping
 - Improved error printer
+- Improved string escaping
 
 ### v0.0.3-2pre
 - Language transition from C to Java

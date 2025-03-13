@@ -17,7 +17,10 @@ import modeling.TokenType;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3 (Mar 12 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3-1 (Mar 13 2025)";
+    
+    public static final int FILE_NOT_FOUND = 1;
+    public static final int INVALID_ESCOMSOLE_CALL = -1;
     
     private static int prevState = 0;
     
@@ -33,7 +36,7 @@ public class Interpreter {
             LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
             System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
             
-            return Status.SCAN_EOF;
+            return LexicalScannerStatus.SCAN_EOF;
         }
         
         if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n in some cases
@@ -42,10 +45,10 @@ public class Interpreter {
         // System.out.println("Received data: " + code); // Debug
 
         int previousTotalTokens = LexicalScanner.tokens.size();
-        int status = Status.SCAN_SUCCESS;
+        int status = LexicalScannerStatus.SCAN_SUCCESS;
         prevState = LexicalScanner.scan(codeSnippet, lineNumber, prevState);
 
-        if (Status.isError(prevState))
+        if (LexicalScannerStatus.isError(prevState))
             status = prevState;
         
         for (; previousTotalTokens < LexicalScanner.tokens.size(); previousTotalTokens++)
@@ -62,9 +65,9 @@ public class Interpreter {
     public static int executeFile(String filePath) {
         File f = new File(filePath);
         if (!f.exists())
-            return Status.FILE_NOT_FOUND; // File not found
+            return FILE_NOT_FOUND;
 
-        int exitCode = Status.RUN_SUCCESS;
+        int exitCode = LexicalScannerStatus.RUN_SUCCESS;
         int lineNumber = 1;
         String fileLine;
         
@@ -79,8 +82,8 @@ public class Interpreter {
 
                 exitCode = execute(fileLine, lineNumber);
                 
-                if (exitCode == Status.SCAN_EOF) {
-                    exitCode = Status.RUN_SUCCESS;
+                if (exitCode == LexicalScannerStatus.SCAN_EOF) {
+                    exitCode = LexicalScannerStatus.RUN_SUCCESS;
                     break;
                 } if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
@@ -104,7 +107,7 @@ public class Interpreter {
      * @return the status exit code
      */
     public static int repl() {
-        int exitCode = Status.RUN_SUCCESS;
+        int exitCode = LexicalScannerStatus.RUN_SUCCESS;
         int lineNumber = 1;
         
         System.out.println(ESCOMSOLE_VERSION + ". Press CTRL + Z to exit.");
@@ -126,8 +129,8 @@ public class Interpreter {
                 
                 exitCode = execute(fileLine, lineNumber);
                 
-                if (exitCode == Status.SCAN_EOF) {
-                    exitCode = Status.RUN_SUCCESS;
+                if (exitCode == LexicalScannerStatus.SCAN_EOF) {
+                    exitCode = LexicalScannerStatus.RUN_SUCCESS;
                     break;
                 } else if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
@@ -144,10 +147,10 @@ public class Interpreter {
         String data;
 
         switch (errorCode) {
-            case Status.MALFORMED_NUMBER:
+            case LexicalScannerStatus.MALFORMED_NUMBER:
                 data = "A number is malformed";
             break;
-            case Status.INVALID_STRING:
+            case LexicalScannerStatus.INVALID_STRING:
                 data = "Unterminated string literal";
             break;
             default: // SYNTAX ERROR
@@ -164,7 +167,7 @@ public class Interpreter {
 
         marker += "----";
         
-        for (int i = 0; i < LexicalScanner.scanIndex - 1; i++)
+        for (int i = 0; i < LexicalScanner.scanIndex; i++)
             marker += "-";
         
         marker += "^";

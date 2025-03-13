@@ -3,6 +3,7 @@
 .idea
 out
 cmake-build-debug
+.vscode
 
 # Files
 CMakeLists.txt

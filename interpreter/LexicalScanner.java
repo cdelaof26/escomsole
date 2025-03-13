@@ -135,7 +135,7 @@ public class LexicalScanner {
                     } else {
                         if (!Character.isWhitespace(c))
 //                            System.out.println("Unknown char c = '" + c + "' state 0"); // Debug
-                             return Status.SYNTAX_ERROR;
+                             return LexicalScannerStatus.SYNTAX_ERROR;
                     }
                 break;
                 
@@ -217,7 +217,7 @@ public class LexicalScanner {
                         state = 17;
                         lexeme += c;
                     } else
-                        return Status.MALFORMED_NUMBER;
+                        return LexicalScannerStatus.MALFORMED_NUMBER;
                 break;
                 
                 case 17:
@@ -242,7 +242,7 @@ public class LexicalScanner {
                         state = 19;
                         lexeme += c;
                     } else
-                        return Status.MALFORMED_NUMBER;
+                        return LexicalScannerStatus.MALFORMED_NUMBER;
                 break;
                 
                 case 19:
@@ -250,7 +250,7 @@ public class LexicalScanner {
                         state = 20;
                         lexeme += c;
                     } else
-                        return Status.MALFORMED_NUMBER;
+                        return LexicalScannerStatus.MALFORMED_NUMBER;
                 break;
                 
                 case 20:
@@ -271,8 +271,7 @@ public class LexicalScanner {
                     } else if (c == '/') {
                         state = 28;
                     } else if (c == '=') {
-                        Token t = new Token(TokenType.ESC_SLASH_EQUAL, lineNumber);
-                        tokens.add(t);
+                        tokens.add(new Token(TokenType.ESC_SLASH_EQUAL, lineNumber));
                         state = 0;
                     } else { // state 30
                         tokens.add(new Token(TokenType.ESC_SLASH, lineNumber));
@@ -350,39 +349,38 @@ public class LexicalScanner {
                 
                 case 43:
                     if (c == '\n') {
-                        return Status.INVALID_STRING;
+                        return LexicalScannerStatus.INVALID_STRING;
                     } else if (c == '\\') {
                         state = 59;
                         lexeme += c;
-                    }else if(c == '"'){
+                    } else if(c == '"') {
                         lexeme += c; 
-                        Token t = new Token (TokenType.ESC_STRING,lexeme, myString, lineNumber);
-                        tokens.add(t);
+                        tokens.add(new Token (TokenType.ESC_STRING, lexeme, myString, lineNumber));
                         state = 0;
                         lexeme = "";
                         myString = "";
-                    }else{
+                    } else {
                         myString += c;
                         lexeme += c;
                     }
                 break;
                 
                 case 59:
-                    if (c == '\"') {
+                    if (c == '\"')
                         myString += '\"';
-                    }else if(c == 'n'){
+                    else if(c == 'n')
                         myString += '\n';
-                    }else if(c == 't'){
+                    else if(c == 't')
                         myString += '\t';
-                    }else if (c == '\\'){
+                    else if (c == '\\')
                         myString += '\\';
-                    }
+                    
                     lexeme += c;
                     state = 43;
                 break;
 
                 default:
-                return Status.SYNTAX_ERROR;
+                return LexicalScannerStatus.SYNTAX_ERROR;
             }
         }
 
