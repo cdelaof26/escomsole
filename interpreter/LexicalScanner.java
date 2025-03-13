@@ -96,7 +96,7 @@ public class LexicalScanner {
 
             switch (state) {
                 case 0:
-                    if (Character.isLetter(c)) { // IDENTIFIERS and reserved words
+                    if (Character.isLetter(c) || c == '_') { // IDENTIFIERS and reserved words
                         state = 13;
                         lexeme += c;
                     } else if (Character.isDigit(c)) { // Numbers
@@ -178,7 +178,7 @@ public class LexicalScanner {
                 break;
                 
                 case 13:
-                    if (Character.isLetterOrDigit(c)) { // IDENTIFIERS and reserved words
+                    if (Character.isLetterOrDigit(c) || c == '_') { // IDENTIFIERS and reserved words
                         lexeme += c;
                     } else { // end of identifier or reserved word
                         Token t;

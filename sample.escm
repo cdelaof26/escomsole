@@ -6,6 +6,8 @@
 
 print "Script start";
 
+var MY_NUMBER_CONSTANT = 47;
+
 var myBooleanVar = true;
 var myVar = 8.61;
 var myVar2 = 30;
