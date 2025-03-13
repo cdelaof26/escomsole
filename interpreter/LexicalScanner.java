@@ -69,7 +69,7 @@ public class LexicalScanner {
     public static int scan(String codeSnippet, int lineNumber, int previousState) {
         char c;
         int state = previousState < 0 ? 0 : previousState;
-        String lexeme = "";
+        String lexeme = "", myString = "";
         
         // System.out.println("line " + code); // Debug
         // System.out.println(String.format("LINE #%d ; len %d", fileLine, code.length())); // Debug
@@ -354,22 +354,29 @@ public class LexicalScanner {
                     } else if (c == '\\') {
                         state = 59;
                         lexeme += c;
-                    } else if (c == '"') {
-                        String s = lexeme.substring(1);
-                        s = s.replace("\\n", "\n");
-                        s = s.replace("\\n", "\t"); 
-                        s = s.replace("\\\"", "\"");
+                    }else if(c == '"'){
                         lexeme += c; 
-                        Token t = new Token (TokenType.ESC_STRING, lexeme, s, lineNumber);
+                        Token t = new Token (TokenType.ESC_STRING,lexeme, myString, lineNumber);
                         tokens.add(t);
                         state = 0;
                         lexeme = "";
-                    } else {
+                        myString = "";
+                    }else{
+                        myString += c;
                         lexeme += c;
                     }
                 break;
                 
                 case 59:
+                    if (c == '\"') {
+                        myString += '\"';
+                    }else if(c == 'n'){
+                        myString += '\n';
+                    }else if(c == 't'){
+                        myString += '\t';
+                    }else if (c == '\\'){
+                        myString += '\\';
+                    }
                     lexeme += c;
                     state = 43;
                 break;
