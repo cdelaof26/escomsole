@@ -154,7 +154,7 @@ public class Interpreter {
                 data = "Unterminated string literal";
             break;
             default: // SYNTAX ERROR
-                data = "Invalid syntax";
+                data = "Invalid character";
             break;
         }
         

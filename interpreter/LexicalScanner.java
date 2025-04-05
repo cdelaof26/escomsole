@@ -227,7 +227,7 @@ public class LexicalScanner {
                         state = 18;
                         lexeme += c;
                     } else {
-                        tokens.add(new Token(TokenType.ESC_NUMBER, lexeme, Float.valueOf(lexeme), lineNumber));
+                        tokens.add(new Token(TokenType.ESC_FLOATING_NUMBER, lexeme, Float.valueOf(lexeme), lineNumber));
                         lexeme = "";
                         state = 0;
                         scanIndex--;
@@ -257,7 +257,7 @@ public class LexicalScanner {
                     if (Character.isDigit(c)) { // state 20
                         lexeme += c;
                     } else {
-                        tokens.add(new Token(TokenType.ESC_NUMBER, lexeme, Float.valueOf(lexeme), lineNumber));
+                        tokens.add(new Token(TokenType.ESC_DOUBLE_NUMBER, lexeme, Double.valueOf(lexeme), lineNumber));
                         lexeme = "";
                         state = 0;
                         scanIndex--;
