@@ -2,6 +2,7 @@ package interpreter;
 
 import java.util.ArrayList;
 import modeling.NonTerminal;
+import modeling.Token;
 import modeling.TokenType;
 
 /**
@@ -10,9 +11,29 @@ import modeling.TokenType;
  */
 public class SyntacticAnalyzer {
     private static int analysisTokenIndex = 0;
+    private static TokenType expected = TokenType.NONE;
     
     private static void throwError() throws IllegalStateException {
+        if (analysisTokenIndex >= LexicalScanner.tokens.size())
+            throw new IllegalStateException("Syntax error - missing tokens");
+        
         throw new IllegalStateException(String.format("Syntax error; token #%d: %s", analysisTokenIndex, LexicalScanner.tokens.get(analysisTokenIndex)));
+    }
+
+    public static Token [] getFoundAndExpectedToken() {
+        Token t;
+        if (analysisTokenIndex >= LexicalScanner.tokens.size())
+            t = new Token(TokenType.NONE, -1);
+        else
+            t = LexicalScanner.tokens.get(analysisTokenIndex);
+        
+        return new Token[] {
+            t, new Token(expected, t.getLine())
+        };
+    }
+
+    public static void setAnalysisTokenIndex(int analysisTokenIndex) {
+        SyntacticAnalyzer.analysisTokenIndex = analysisTokenIndex;
     }
     
     /**
@@ -76,7 +97,10 @@ public class SyntacticAnalyzer {
             case ARGUMENTS:      ARGUMENTS();      break;
             case ARGUMENTS_P:    ARGUMENTS_P();    break;
             
-            default: throwError();
+            default:
+                expected = TokenType.NONE;
+                throwError();
+            break;
         }
     }
     
@@ -114,6 +138,7 @@ public class SyntacticAnalyzer {
             if (canBeEpsilon)
                 return null;
             
+            expected = TokenType.NONE;
             throwError();
         }
         
@@ -158,7 +183,10 @@ public class SyntacticAnalyzer {
                 match(TokenType.ESC_RIGHT_PAREN);
                 BLOCK();
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_FUN;
+                throwError();
+            break;
         }
     }
 
@@ -170,7 +198,10 @@ public class SyntacticAnalyzer {
                 VAR_INIT();
                 match(TokenType.ESC_SEMICOLON);
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_VAR;
+                throwError();
+            break;
         }
     }
 
@@ -203,7 +234,10 @@ public class SyntacticAnalyzer {
                 match(TokenType.ESC_RIGHT_PAREN);
                 STATEMENT();
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_FOR;
+                throwError();
+            break;
         }
     }
 
@@ -229,7 +263,10 @@ public class SyntacticAnalyzer {
                 STATEMENT();
                 ELSE_STATEMENT();
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_IF;
+                throwError();
+            break;
         }
     }
 
@@ -244,7 +281,10 @@ public class SyntacticAnalyzer {
                 EXPRESSION();
                 match(TokenType.ESC_SEMICOLON);
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_PRINT;
+                throwError();
+            break;
         }
     }
 
@@ -255,7 +295,10 @@ public class SyntacticAnalyzer {
                 RETURN_EXP_OPC();
                 match(TokenType.ESC_SEMICOLON);
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_RETURN;
+                throwError();
+            break;
         }
     }
 
@@ -272,7 +315,10 @@ public class SyntacticAnalyzer {
                 match(TokenType.ESC_RIGHT_PAREN);
                 STATEMENT();
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_WHILE;
+                throwError();
+            break;
         }
     }
 
@@ -283,7 +329,10 @@ public class SyntacticAnalyzer {
                 DECLARATION();
                 match(TokenType.ESC_RIGHT_BRACE);
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_LEFT_BRACE;
+                throwError();
+            break;
         }
     }
 
@@ -371,7 +420,10 @@ public class SyntacticAnalyzer {
                 ARGUMENTS();
                 match(TokenType.ESC_RIGHT_BRACKET);
             break;
-            default: throwError();
+            default:
+                expected = TokenType.ESC_LEFT_BRACKET;
+                throwError();
+            break;
         }
     }
     
@@ -405,6 +457,8 @@ public class SyntacticAnalyzer {
      * @return the token
      */
     private static TokenType getCurrentTokenType() {
+        if (analysisTokenIndex >= LexicalScanner.tokens.size())
+            return TokenType.NONE;
         return LexicalScanner.tokens.get(analysisTokenIndex).getType();
     }
     
@@ -418,6 +472,8 @@ public class SyntacticAnalyzer {
             analysisTokenIndex++;
             return;
         }
+        
+        expected = t;
         
         throwError();
     }

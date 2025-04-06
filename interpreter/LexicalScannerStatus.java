@@ -13,8 +13,9 @@ public class LexicalScannerStatus {
     public static final int MALFORMED_NUMBER = -2;
     public static final int INVALID_STRING = -3;
 
+    public static final int UNCLOSED_COMMENT = -4;
     
     public static boolean isError(int code) {
-        return code == INVALID_CHAR || code == MALFORMED_NUMBER || code == INVALID_STRING;
+        return code == INVALID_CHAR || code == MALFORMED_NUMBER || code == INVALID_STRING || code == UNCLOSED_COMMENT;
     }
 }

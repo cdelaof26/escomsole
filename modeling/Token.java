@@ -54,6 +54,10 @@ public class Token {
     public TokenType getType() {
         return type;
     }
+    
+    public String getStrType() {
+        return StrTokenType.STR_TOKEN[type.ordinal()];
+    }
 
     public String getLexeme() {
         return lexeme;

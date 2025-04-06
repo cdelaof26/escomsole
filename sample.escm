@@ -4,6 +4,29 @@
     in C.
 */
 
+fun functionWithNoParameters() {
+    for (var i = 0; i < 10; i++)
+        print "Hello";
+
+    for (; i < 10;)
+        print "Hello";
+
+    for (;;)
+        print "Hello";
+}
+
+fun functionParameters(a, b, c) {
+    print "A: " + a + "; B: " + b + "; C: " + c;
+    
+    if (a == b) {
+        a = c;
+    }
+
+    while (a > b) {
+        a--;
+    }
+}
+
 print "Script start";
 
 var MY_NUMBER_CONSTANT = 47;
@@ -26,3 +49,4 @@ myVar2 *= 9.9;
 
 print myVar and myBooleanVar;
 print myBooleanVar ? myVar : myVar2;
+print myBooleanVar ? myVar : comparison ? myVar2 : myArray;

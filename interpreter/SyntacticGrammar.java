@@ -226,6 +226,10 @@ public class SyntacticGrammar {
             // Added feature, support for array access notation: "a[v]"
             {NonTerminal.ARRAY},
             
+            // Added feature, ternary operator: EXPRESSION ? EXPRESSION : EXPRESSION
+            // The first expression is already captured
+            {TokenType.ESC_QUESTION_MARK, NonTerminal.EXPRESSION, TokenType.ESC_COLON, NonTerminal.EXPRESSION},
+            
             null
         });
         

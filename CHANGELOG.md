@@ -1,5 +1,8 @@
 ## Version history
 
+### v0.0.4
+- Syntax analyzer
+
 ### v0.0.4pre
 - Initial syntax analyzer
 - TODO: Implement ternary operator
