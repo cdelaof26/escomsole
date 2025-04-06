@@ -117,7 +117,7 @@ public class SyntacticGrammar {
             null
         });
         
-        rules.put(NonTerminal.PRINT_STMT, new Object[][] {{NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}});
+        rules.put(NonTerminal.PRINT_STMT, new Object[][] {{TokenType.ESC_PRINT, NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}});
         
         rules.put(NonTerminal.RETURN_STMT, new Object[][] {{TokenType.ESC_RETURN, NonTerminal.RETURN_EXP_OPC, TokenType.ESC_SEMICOLON}});
         
@@ -141,6 +141,13 @@ public class SyntacticGrammar {
         
         rules.put(NonTerminal.ASSIGNMENT_OPC, new Object[][] {
             {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION},
+            
+            // Added feature, +=, -=, *= and /= operators
+            {TokenType.ESC_PLUS_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_MINUS_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_STAR_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_SLASH_EQUAL, NonTerminal.EXPRESSION}, 
+            
             null
         });
         
@@ -181,6 +188,11 @@ public class SyntacticGrammar {
         rules.put(NonTerminal.TERM_P, new Object[][] {
             {TokenType.ESC_MINUS, NonTerminal.TERM},
             {TokenType.ESC_PLUS, NonTerminal.TERM},
+            
+            // Added feature: ++ and -- operators
+            {TokenType.ESC_MINUS_MINUS},
+            {TokenType.ESC_PLUS_PLUS},
+            
             null
         });
         
@@ -202,8 +214,18 @@ public class SyntacticGrammar {
         
         rules.put(NonTerminal.CALL, new Object[][] {{NonTerminal.PRIMARY, NonTerminal.CALL_P}});
         
+        
+        // Added feature, support for array notation: "[]", "[v]", "[v, v, ···, v]"
+        // ARRAY -> [ARGUMENTS]
+        rules.put(NonTerminal.ARRAY, new Object[][] {{TokenType.ESC_LEFT_BRACKET, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_BRACKET}});
+        
+        
         rules.put(NonTerminal.CALL_P, new Object[][] {
             {TokenType.ESC_LEFT_PAREN, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_PAREN},
+            
+            // Added feature, support for array access notation: "a[v]"
+            {NonTerminal.ARRAY},
+            
             null
         });
         
@@ -212,9 +234,14 @@ public class SyntacticGrammar {
             {TokenType.ESC_FALSE},
             {TokenType.ESC_NULL},
             {TokenType.ESC_NUMBER},
+            {TokenType.ESC_FLOATING_NUMBER},
+            {TokenType.ESC_DOUBLE_NUMBER},
             {TokenType.ESC_STRING},
             {TokenType.ESC_IDENTIFIER},
-            {TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN}
+            {TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN},
+            
+            // Added feature, support for array initialization: "var a = [];"
+            {NonTerminal.ARRAY}
         });
         
         
@@ -243,10 +270,17 @@ public class SyntacticGrammar {
         // */
     }
 
-    // Pseudo code extracted from
-    // https://campusvirtual.ull.es/ocw/pluginfile.php/3850/mod_resource/content/0/perlexamples/node194.html
-    // 2012-05-22
-    //
+    /**
+     * This function calculates the first set for a value.<br>
+     * Pseudo code extracted from<br>
+     * https://campusvirtual.ull.es/ocw/pluginfile.php/3850/mod_resource/content/0/perlexamples/node194.html<br>
+     * 2012-05-22
+     * 
+     * @param alpha the NonTerminal or TokenType (terminal) value to calculate 
+     * the first set from
+     * @param prev the previous NonTerminal or TokenType value (should be null the first call)
+     * @return the first set of the provided value
+     */
     public static ArrayList<Object> first(Object alpha, Object prev) {
 //        System.out.println("alpha = " + alpha);
 //        System.out.println("prev = " + prev);
@@ -259,39 +293,40 @@ public class SyntacticGrammar {
         
         if (alpha instanceof TokenType) {
             set.add(alpha);
-        } else {
-            Object [][] productions = rules.get((NonTerminal) alpha);
-            for (Object [] p : productions) {
-                if (p == null) {
-                    if (!set.contains(p))
-                        set.add(p);
-                    
-                    continue;
-                }
-                
-                boolean containsEpsilon = false;
-                for (Object e : p) {
-                    for (Object o : first(e, alpha)) {
-                        if (o == null) {
-                            containsEpsilon = true;
-                            continue;
-                        }
-                        
-                        if (!set.contains(o))
-                            set.add(o);
+            return set;
+        }
+        
+        Object [][] productions = rules.get((NonTerminal) alpha);
+        for (Object [] p : productions) {
+            if (p == null) {
+                if (!set.contains(p))
+                    set.add(p);
+
+                continue;
+            }
+
+            boolean containsEpsilon = false;
+            for (Object pe : p) {
+                for (Object o : first(pe, alpha)) {
+                    if (o == null) {
+                        containsEpsilon = true;
+                        continue;
                     }
-                    
-                    if (!containsEpsilon)
-                        break;
+
+                    if (!set.contains(o))
+                        set.add(o);
                 }
-                
+
+                if (!containsEpsilon)
+                    break;
+            }
+
 //                if (!containsEpsilon)
 //                    break;
-            }
-            
-            if (!set.contains(null) && productions[productions.length - 1] == null)
-                set.add(null);
         }
+
+        if (!set.contains(null) && productions[productions.length - 1] == null)
+            set.add(null);
         
         return set;
     }

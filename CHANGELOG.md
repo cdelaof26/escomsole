@@ -1,5 +1,11 @@
 ## Version history
 
+### v0.0.4pre
+- Initial syntax analyzer
+- TODO: Implement ternary operator
+        Expand sample code
+        Rewrite Interpreter logic
+
 ### v0.0.3-1
 - Operator analyzer
 - String analyzer

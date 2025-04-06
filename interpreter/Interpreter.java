@@ -17,7 +17,7 @@ import modeling.TokenType;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.3-1 (Mar 13 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4pre (Apr 05 2025)";
     
     public static final int FILE_NOT_FOUND = 1;
     public static final int INVALID_ESCOMSOLE_CALL = -1;
@@ -25,7 +25,7 @@ public class Interpreter {
     private static int prevState = 0;
     
     /**
-     * Given a code line, this function analyses it then executes it
+     * Given a line of code, this function analyses it and then executes it
      * 
      * @param codeSnippet the code to run
      * @param lineNumber the line number in the file
@@ -34,7 +34,7 @@ public class Interpreter {
     public static int execute(String codeSnippet, int lineNumber) {
         if (codeSnippet == null) {
             LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
-            System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
+            // System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
             
             return LexicalScannerStatus.SCAN_EOF;
         }
@@ -44,15 +44,15 @@ public class Interpreter {
         
         // System.out.println("Received data: " + code); // Debug
 
-        int previousTotalTokens = LexicalScanner.tokens.size();
+        // int previousTotalTokens = LexicalScanner.tokens.size();
         int status = LexicalScannerStatus.SCAN_SUCCESS;
         prevState = LexicalScanner.scan(codeSnippet, lineNumber, prevState);
 
         if (LexicalScannerStatus.isError(prevState))
             status = prevState;
         
-        for (; previousTotalTokens < LexicalScanner.tokens.size(); previousTotalTokens++)
-            System.out.println(LexicalScanner.tokens.get(previousTotalTokens));
+        // for (; previousTotalTokens < LexicalScanner.tokens.size(); previousTotalTokens++)
+        //     System.out.println(LexicalScanner.tokens.get(previousTotalTokens));
        
         return status;
     }
@@ -69,7 +69,7 @@ public class Interpreter {
 
         int exitCode = LexicalScannerStatus.RUN_SUCCESS;
         int lineNumber = 1;
-        String fileLine;
+        String fileLine = "";
         
         // This notation is called try-with-resources, there's no need to manually
         // open/close whatever resource we are accessing
@@ -84,6 +84,7 @@ public class Interpreter {
                 
                 if (exitCode == LexicalScannerStatus.SCAN_EOF) {
                     exitCode = LexicalScannerStatus.RUN_SUCCESS;
+                    
                     break;
                 } if (exitCode != 0) {
                     // System.err.println("error " + exitCode); // Debug
@@ -98,6 +99,13 @@ public class Interpreter {
         } catch (IOException ex) {
             Logger.getLogger(Interpreter.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        // Debug
+        System.out.println("LexicalScanner.tokens = ");
+        for (int i = 0; i < LexicalScanner.tokens.size(); i++)
+            System.out.println(i + ".    " + LexicalScanner.tokens.get(i));
+        
+        SyntacticAnalyzer.PROGRAM();
 
         return exitCode;
     }
@@ -153,8 +161,11 @@ public class Interpreter {
             case LexicalScannerStatus.INVALID_STRING:
                 data = "Unterminated string literal";
             break;
-            default: // SYNTAX ERROR
+            case LexicalScannerStatus.INVALID_CHAR:
                 data = "Invalid character";
+            break;
+            default: // SYNTAX ERROR
+                data = "Invalid syntax";
             break;
         }
         

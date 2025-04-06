@@ -135,7 +135,7 @@ public class LexicalScanner {
                     } else {
                         if (!Character.isWhitespace(c))
 //                            System.out.println("Unknown char c = '" + c + "' state 0"); // Debug
-                             return LexicalScannerStatus.SYNTAX_ERROR;
+                             return LexicalScannerStatus.INVALID_CHAR;
                     }
                 break;
                 
@@ -380,7 +380,7 @@ public class LexicalScanner {
                 break;
 
                 default:
-                return LexicalScannerStatus.SYNTAX_ERROR;
+                return LexicalScannerStatus.INVALID_CHAR;
             }
         }
 
