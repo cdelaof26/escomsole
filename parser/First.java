@@ -40,9 +40,6 @@ public class First {
         List<TokenType> setTerminals = new ArrayList<>();
 
         for(Object[] production : SetRules) {
-            if (Arrays.asList(production).contains(Cabecera)) {
-                    continue;
-            }
             setTerminals.addAll(TheFirst(production));
         }
         return setTerminals; 
@@ -90,9 +87,6 @@ public class First {
 
         List<TokenType> OficialList = new ArrayList<>();
         for (Object[] production : SetRules) {
-          if (Arrays.asList(production).contains(Cabecera)) {
-            continue;
-          }
           System.out.println(production);
           OficialList = TheFirst(production);
           System.out.println(OficialList);
