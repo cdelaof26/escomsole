@@ -18,7 +18,7 @@ public class EscomsoleJE {
                 System.err.println(String.format("File '%s' not found\n", new File(args[0]).getAbsolutePath()));
             
             if (status == 0)
-                System.out.println("Valid syntax");
+                System.out.println("Valid program");
             
             System.exit(status);
         }

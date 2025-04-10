@@ -26,10 +26,17 @@ public class SyntacticAnalyzer {
             t = new Token(TokenType.NONE, -1);
         else
             t = LexicalScanner.tokens.get(analysisTokenIndex);
-        
+
         return new Token[] {
             t, new Token(expected, t.getLine())
         };
+    }
+
+    public static Token getNextToken() {
+        if (analysisTokenIndex + 1 >= LexicalScanner.tokens.size())
+            return new Token(TokenType.NONE, -1);
+
+        return LexicalScanner.tokens.get(analysisTokenIndex + 1);
     }
 
     public static void setAnalysisTokenIndex(int analysisTokenIndex) {
@@ -429,6 +436,18 @@ public class SyntacticAnalyzer {
     
     
     private static void CALL_P() {
+        // If the current token is '(' then the previous one must be an identifier
+        //
+        if (analysisTokenIndex - 1 > 0) {
+            TokenType prev = LexicalScanner.tokens.get(analysisTokenIndex - 1).getType();
+            TokenType current = LexicalScanner.tokens.get(analysisTokenIndex).getType();
+            
+            if (prev != TokenType.ESC_IDENTIFIER && current == TokenType.ESC_LEFT_PAREN) {
+                expected = TokenType.OPERATOR;
+                throwError();
+            }
+        }
+        
         findAppropriateProductionWrap(NonTerminal.CALL_P);
     }
 
@@ -456,7 +475,7 @@ public class SyntacticAnalyzer {
      * Retrieves the TokenType of the token being analyzed
      * @return the token
      */
-    private static TokenType getCurrentTokenType() {
+    public static TokenType getCurrentTokenType() {
         if (analysisTokenIndex >= LexicalScanner.tokens.size())
             return TokenType.NONE;
         return LexicalScanner.tokens.get(analysisTokenIndex).getType();

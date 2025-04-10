@@ -1,5 +1,10 @@
 ## Version history
 
+### v0.0.4-1
+- Improved error printing
+    - Fix for an edge case when a syntactic error arises
+- Only identifiers are callable
+
 ### v0.0.4
 - Syntax analyzer
 

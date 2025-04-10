@@ -10,6 +10,8 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import modeling.Token;
 import modeling.TokenType;
 
@@ -18,7 +20,7 @@ import modeling.TokenType;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4 (Apr 06 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4-1 (Apr 10 2025)";
     
     public static final int FILE_NOT_FOUND = 1;
     public static final int INVALID_ESCOMSOLE_CALL = -1;
@@ -124,6 +126,9 @@ public class Interpreter {
                 printError(SyntacticAnalyzerStatus.SYNTAX_ERROR);
                 return SyntacticAnalyzerStatus.SYNTAX_ERROR;
             }
+            
+            if (SyntacticAnalyzer.getCurrentTokenType() != TokenType.ESC_EOF)
+                return SyntacticAnalyzerStatus.SYNTAX_ERROR;
         
             for (String c : code)
                 execute(c);
@@ -237,23 +242,60 @@ public class Interpreter {
         String line = code.get(fileLine - 1);
         
         String data = "Error in line " + fileLine;
+        int markerIndex = -1;
         
         if (errorCode == SyntacticAnalyzerStatus.SYNTAX_ERROR) {
             String exp = foundExpected[1].getStrType();
-            String foo = foundExpected[0].getStrType();
+            String foo = foundExpected[0].getRepresentation();
             
             data = "Syntax error in line " + fileLine;
-            if (!exp.equals("") && !exp.equals(foo))
+            if (!exp.equals("") && !exp.equals(foo)) {
                 data += String.format(", expected '%s' but found '%s'", exp, foo);
-            else
+                
+                Token t = SyntacticAnalyzer.getNextToken();
+                String next = t.getRepresentation();
+                
+                // System.out.println("next = " + next);
+                
+                if (!next.equals("")) {
+                    String regex = Pattern.quote(foo) + " *?" + Pattern.quote(next);
+                    
+                    Matcher m = Pattern.compile(regex).matcher(line);
+                    while (m.find()) {
+                        // System.out.println(m.group()); // debug
+                        markerIndex = m.start();
+                    }
+                }
+                
+                if (markerIndex == -1 && !next.equals("")) {
+                    String regex = Pattern.quote(foo);
+                    
+                    Matcher m = Pattern.compile(regex).matcher(line);
+                    while (m.find()) {
+                        // System.out.println(m.group()); // debug
+                        markerIndex = m.start();
+                    }
+                }
+            } else
                 data += String.format(" near '%s'", foo);
         }
         
-        System.err.println(String.format("%s", data));
+        System.err.println(data);
         if (showPrevNext && fileLine - 1 > 0)
             System.err.println(String.format("  %d    %s", fileLine - 1, code.get(fileLine - 2)));
         
         System.err.println(String.format("  %d    %s", fileLine, line));
+        if (markerIndex != -1) {
+            String marker = "  ";
+            
+            for (int i = 0; i < ("" + fileLine).length(); i++)
+                marker += " ";
+            marker += "----";
+            for (int i = 0; i < markerIndex; i++)
+                marker += "-";
+
+            System.err.println(marker + "^");
+        }
         
         if (showPrevNext && fileLine < code.size())
             System.err.println(String.format("  %d    %s", fileLine + 1, code.get(fileLine)));

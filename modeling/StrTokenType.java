@@ -27,6 +27,6 @@ public class StrTokenType {
         "and", "else", "false", "fun", "for", "if", "null", "or",
         "print", "return", "true", "var", "while",
 
-        "$", "", "expression"
+        "EOF", "", "expression", "operator"
     };
 }

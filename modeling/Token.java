@@ -1,10 +1,22 @@
 package modeling;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author cristopher
  */
 public class Token {
+    private static final ArrayList<TokenType> lexemeRepresentation = new ArrayList<>();
+    
+    static {
+        lexemeRepresentation.add(TokenType.ESC_IDENTIFIER);
+        lexemeRepresentation.add(TokenType.ESC_NUMBER);
+        lexemeRepresentation.add(TokenType.ESC_FLOATING_NUMBER);
+        lexemeRepresentation.add(TokenType.ESC_DOUBLE_NUMBER);
+        lexemeRepresentation.add(TokenType.ESC_STRING);
+    }
+    
     private final TokenType type;
     private final String lexeme;
     private final Object literal;
@@ -57,6 +69,10 @@ public class Token {
     
     public String getStrType() {
         return StrTokenType.STR_TOKEN[type.ordinal()];
+    }
+    
+    public String getRepresentation() {
+        return lexemeRepresentation.contains(type) ? lexeme : getStrType();
     }
 
     public String getLexeme() {

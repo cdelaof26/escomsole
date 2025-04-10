@@ -143,10 +143,10 @@ public class SyntacticGrammar {
             {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION},
             
             // Added feature, +=, -=, *= and /= operators
-            {TokenType.ESC_PLUS_EQUAL, NonTerminal.EXPRESSION}, 
-            {TokenType.ESC_MINUS_EQUAL, NonTerminal.EXPRESSION}, 
             {TokenType.ESC_STAR_EQUAL, NonTerminal.EXPRESSION}, 
             {TokenType.ESC_SLASH_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_PLUS_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_MINUS_EQUAL, NonTerminal.EXPRESSION}, 
             
             null
         });
