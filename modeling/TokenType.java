@@ -1,7 +1,6 @@
 package modeling;
 
 /**
- *
  * @author cristopher
  */
 public enum TokenType {
