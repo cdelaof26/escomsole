@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import modeling.Token;
 import modeling.TokenType;
+import parser.Parser;
 
 /**
  *
@@ -32,30 +33,39 @@ public class Interpreter {
      * @return the status code
      */
     public static int execute(String codeSnippet, int lineNumber) {
-        if (codeSnippet == null) {
-            LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
-            System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
-            
-            return LexicalScannerStatus.SCAN_EOF;
-        }
-        
-        if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n in some cases
-            codeSnippet += "\n";
-        
-        // System.out.println("Received data: " + code); // Debug
+    if (codeSnippet == null) {
+        LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
+        System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
 
-        int previousTotalTokens = LexicalScanner.tokens.size();
-        int status = LexicalScannerStatus.SCAN_SUCCESS;
-        prevState = LexicalScanner.scan(codeSnippet, lineNumber, prevState);
-
-        if (LexicalScannerStatus.isError(prevState))
-            status = prevState;
-        
-        for (; previousTotalTokens < LexicalScanner.tokens.size(); previousTotalTokens++)
-            System.out.println(LexicalScanner.tokens.get(previousTotalTokens));
-       
-        return status;
+        return LexicalScannerStatus.SCAN_EOF;
     }
+
+    if (!codeSnippet.endsWith("\n")) // The automaton requires to know if there's a \n in some cases
+        codeSnippet += "\n";
+
+    int previousTotalTokens = LexicalScanner.tokens.size();
+    int status = LexicalScannerStatus.SCAN_SUCCESS;
+    prevState = LexicalScanner.scan(codeSnippet, lineNumber, prevState);
+
+    if (LexicalScannerStatus.isError(prevState))
+        status = prevState;
+
+    for (; previousTotalTokens < LexicalScanner.tokens.size(); previousTotalTokens++)
+        System.out.println(LexicalScanner.tokens.get(previousTotalTokens));
+    
+    // Llamar al parser después del escaneo léxico
+    if (status == LexicalScannerStatus.SCAN_SUCCESS) {
+        Parser parser = new Parser(); // Crear una instancia del parser
+        if (!parser.parse()) {
+            printError(codeSnippet, lineNumber, LexicalScannerStatus.SYNTAX_ERROR);
+            return LexicalScannerStatus.SYNTAX_ERROR; // Error en la sintaxis
+        }
+    }
+    
+    return status;
+}
+
+
     
     /**
      * Given a file path, this function runs all the code within.

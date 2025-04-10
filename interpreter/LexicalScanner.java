@@ -15,7 +15,7 @@ public class LexicalScanner {
     };
 
     private static final ArrayList<Character> SYMBOLS = new ArrayList<>();
-    private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList();
+    private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList<>();
 
     static {
         SYMBOLS.add('(');
