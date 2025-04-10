@@ -1,7 +1,6 @@
 package modeling;
 
 /**
- *
  * @author cristopher
  */
 public enum TokenType {
@@ -23,7 +22,7 @@ public enum TokenType {
     ESC_LESS, ESC_LESS_EQUAL,
 
     // Literales
-    ESC_IDENTIFIER, ESC_STRING, ESC_NUMBER,
+    ESC_IDENTIFIER, ESC_STRING, ESC_NUMBER, ESC_FLOATING_NUMBER, ESC_DOUBLE_NUMBER,
 
     // Palabras clave
     ESC_AND, ESC_ELSE, ESC_FALSE, ESC_FUN, ESC_FOR, ESC_IF, ESC_NULL, ESC_OR,
