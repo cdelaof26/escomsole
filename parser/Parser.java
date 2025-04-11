@@ -1,8 +1,8 @@
 package parser;
 
-import modeling.TokenType;
 import interpreter.LexicalScanner;
 import modeling.NoTerminales;
+import modeling.TokenType;
 
 public class Parser {
     private ParserUtils utils;
@@ -13,8 +13,8 @@ public class Parser {
 
     public boolean parse() {
       PROGRAM();
-        System.out.println("Programa válido");
-        return true;
+      System.out.println("Programa válido");
+      return true;
     }
 
     private void PROGRAM() {

@@ -48,10 +48,8 @@ public class First {
     private static List<TokenType> TheFirst(Object[] Production){
         List<TokenType> SetFirstCompilationProduction = new ArrayList<>();
         int longthProduction = Production.length, countEmptyPerLiteral = 0;
-
         for (Object term : Production) {
-          System.out.println(term);
-            if (term instanceof String) {
+            if (term == null) {
                 SetFirstCompilationProduction.addAll(TheFirst((String)term));
                 countEmptyPerLiteral++;
             }else if (term instanceof  TokenType) {
@@ -81,18 +79,25 @@ public class First {
     //EXAMPLE OF IMPLA
     public static Object[] first(NoTerminales Cabecera){
       Object[][] SetRules = GramaticalRules.Rules.get(Cabecera);
-      System.out.println(SetRules);
         if (SetRules == null)
             return null;
-
         List<TokenType> OficialList = new ArrayList<>();
         for (Object[] production : SetRules) {
-          System.out.println(production);
-          OficialList = TheFirst(production);
-          System.out.println(OficialList);
-          if (Arrays.asList(OficialList).contains(characterPreanalisis)) {
-            return production;
-          }
+            
+            if (production[0] == Cabecera) {
+                continue;
+            }
+            OficialList = TheFirst(production);
+            if (OficialList == null) {
+                return null;
+            } else if (OficialList.get(0) == null) {
+                return production;
+            } 
+            for(int i = 0; i < OficialList.size(); i++){
+                if(OficialList.get(i) == characterPreanalisis){
+                    return production;
+                }
+            }
         }
         
         return null; 
