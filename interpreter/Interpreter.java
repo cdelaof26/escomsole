@@ -189,6 +189,7 @@ public class Interpreter {
                 }
 
                 execute(fileLine);
+                System.out.println("Valid program");
                 lineNumber++;
             }
         }
