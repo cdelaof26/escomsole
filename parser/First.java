@@ -11,28 +11,7 @@ import modeling.TokenType;
 
 
 public class First {
-    public static TokenType characterPreanalisis;//You can replace whit you global vaiable of preanalisis
-
-    private static List<TokenType> TheFirst(String Empty){
-         if(Empty == null){
-            List<TokenType> setEmpty = new ArrayList<>();
-            setEmpty.add(null);
-            return setEmpty;
-         }else{
-            return null;
-         }
-    }
-
-    private static List<TokenType> TheFirst(TokenType Terminal){
-        if(Terminal == null)
-            return null;
-
-        List<TokenType> setTerminal = new ArrayList<>();
-        setTerminal.add(Terminal);
-        return setTerminal;
-    }
-
-    private static List<TokenType> TheFirst(NoTerminales Cabecera){
+    public static List<TokenType> TheFirst(NoTerminales Cabecera){
         Object[][] SetRules = GramaticalRules.Rules.get(Cabecera); 
         if (SetRules == null)
             return null;
@@ -50,10 +29,10 @@ public class First {
         int longthProduction = Production.length, countEmptyPerLiteral = 0;
         for (Object term : Production) {
             if (term == null) {
-                SetFirstCompilationProduction.addAll(TheFirst((String)term));
+                SetFirstCompilationProduction.add(null);
                 countEmptyPerLiteral++;
             }else if (term instanceof  TokenType) {
-                SetFirstCompilationProduction.addAll((TheFirst((TokenType)term)));
+                SetFirstCompilationProduction.add((TokenType)term);
                 break;
             }else if (term instanceof NoTerminales) {
                 List<TokenType> IdentificationEmpty = TheFirst(((NoTerminales)term));
@@ -74,32 +53,5 @@ public class First {
             SetFirstProduction.remove(null);
             return SetFirstProduction;
         }
-    }
-
-    //EXAMPLE OF IMPLA
-    public static Object[] first(NoTerminales Cabecera){
-      Object[][] SetRules = GramaticalRules.Rules.get(Cabecera);
-        if (SetRules == null)
-            return null;
-        List<TokenType> OficialList = new ArrayList<>();
-        for (Object[] production : SetRules) {
-            
-            if (production[0] == Cabecera) {
-                continue;
-            }
-            OficialList = TheFirst(production);
-            if (OficialList == null) {
-                return null;
-            } else if (OficialList.get(0) == null) {
-                return production;
-            } 
-            for(int i = 0; i < OficialList.size(); i++){
-                if(OficialList.get(i) == characterPreanalisis){
-                    return production;
-                }
-            }
-        }
-        
-        return null; 
     }
 }

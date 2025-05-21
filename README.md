@@ -9,6 +9,8 @@ REPL written in Java FTW
 
 ```bash
 javac -cp . escomsoleje/EscomsoleJE.java
+### Para eliminar los .class y compilar luego luego
+find . -name "*.ckass" -exec rm {} \; && javac -cp . escomsoleje/EscomsoleJE.java && java escomsoleje/EscomsoleJE
 ```
 
 ### Usage

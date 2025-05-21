@@ -1,7 +1,9 @@
 package escomsoleje;
 
-import interpreter.Interpreter;
-import java.io.File;
+import java.util.List;
+import modeling.NoTerminales;
+import modeling.TokenType;
+import parser.First;
 
 /**
  * Entry point
@@ -9,7 +11,7 @@ import java.io.File;
  */
 public class EscomsoleJE {
     public static void main(String[] args) {
-        if (args.length == 0) // No user provided arguments
+        /*if (args.length == 0) // No user provided arguments
             System.exit(Interpreter.repl());
         
         if (args.length == 1) { // One user provided argument
@@ -23,5 +25,9 @@ public class EscomsoleJE {
         System.err.println("Usage:\n\tREPL:\t\tjava EscomsoleJE\n\tRun file:\tjava EscomsoleJE path/to/file");
         
         System.exit(Interpreter.INVALID_ESCOMSOLE_CALL);
+        */
+        List<TokenType> A = First.TheFirst(NoTerminales.WHILE_STMT);
+        System.out.println(A.size());
+        System.out.println(A);
     }
 }
