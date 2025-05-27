@@ -20,7 +20,7 @@ import modeling.TokenType;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4-1 (Apr 10 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4-2 (May 26 2025)";
     
     public static final int FILE_NOT_FOUND = 1;
     public static final int INVALID_ESCOMSOLE_CALL = -1;

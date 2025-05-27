@@ -192,7 +192,7 @@ public class SyntacticGrammar {
             // Added feature: ++ and -- operators
             {TokenType.ESC_MINUS_MINUS},
             {TokenType.ESC_PLUS_PLUS},
-            
+
             null
         });
         
@@ -282,18 +282,13 @@ public class SyntacticGrammar {
      * 
      * @param alpha the NonTerminal or TokenType (terminal) value to calculate 
      * the first set from
-     * @param prev the previous NonTerminal or TokenType value (should be null the first call)
      * @return the first set of the provided value
      */
-    public static ArrayList<Object> first(Object alpha, Object prev) {
+    public static ArrayList<Object> first(Object alpha) {
 //        System.out.println("alpha = " + alpha);
 //        System.out.println("prev = " + prev);
 
         ArrayList<Object> set = new ArrayList<>();
-        
-        // This prevents stack overflow
-        if (alpha.equals(prev))
-            return set;
         
         if (alpha instanceof TokenType) {
             set.add(alpha);
@@ -311,7 +306,10 @@ public class SyntacticGrammar {
 
             boolean containsEpsilon = false;
             for (Object pe : p) {
-                for (Object o : first(pe, alpha)) {
+                if (pe.equals(alpha))
+                    continue;
+                
+                for (Object o : first(pe)) {
                     if (o == null) {
                         containsEpsilon = true;
                         continue;

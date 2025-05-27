@@ -1,5 +1,10 @@
 ## Version history
 
+### v0.0.4-2
+- Rewritten syntax analyzer
+- Removed generic syntax analyzer
+- Added modeling expressions and statements
+
 ### v0.0.4-1
 - Improved error printing
     - Fix for an edge case when a syntactic error arises
