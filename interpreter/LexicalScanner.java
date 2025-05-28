@@ -107,7 +107,7 @@ public class LexicalScanner {
                         lexeme += c;
                     } else if (SYMBOLS.contains(c)) { // Punctuation marks
                         TokenType to = SYMBOLS_TOKEN_TYPES.get(SYMBOLS.indexOf(c));
-                        tokens.add(new Token(to, lineNumber));
+                        tokens.add(new Token(to, lineNumber, scanIndex));
                     } else if (c == '+') {
                         state = 1;
                         lexeme += c;
@@ -144,11 +144,11 @@ public class LexicalScanner {
                     state = 0;
                     
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_PLUS_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_PLUS_EQUAL, lineNumber, scanIndex - 1));
                     } else if (c == '+') {
-                        tokens.add(new Token(TokenType.ESC_PLUS_PLUS, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_PLUS_PLUS, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_PLUS, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_PLUS, lineNumber, scanIndex));
                         scanIndex--;
                     }
                 break;
@@ -157,9 +157,9 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0;
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_STAR_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_STAR_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_STAR, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_STAR, lineNumber, scanIndex));
                         scanIndex--;
                     }
                 break;
@@ -168,11 +168,11 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0;
                     if (c == '-') {
-                        tokens.add(new Token(TokenType.ESC_MINUS_MINUS, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_MINUS_MINUS, lineNumber, scanIndex - 1));
                     } else if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_MINUS_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_MINUS_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_MINUS, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_MINUS, lineNumber, scanIndex));
                         scanIndex--;
                     }
                 break;
@@ -184,9 +184,9 @@ public class LexicalScanner {
                         Token t;
                         TokenType type = getTokenType(lexeme);
                         if (type == TokenType.NONE)
-                            t = new Token(TokenType.ESC_IDENTIFIER, lexeme, lineNumber);
+                            t = new Token(TokenType.ESC_IDENTIFIER, lexeme, lexeme, lineNumber, scanIndex - lexeme.length());
                         else
-                            t = new Token(type, lineNumber);
+                            t = new Token(type, lineNumber, scanIndex - lexeme.length());
 
                         lexeme = "";
                         tokens.add(t);
@@ -205,7 +205,10 @@ public class LexicalScanner {
                         state = 18;
                         lexeme += c;
                     } else {
-                        tokens.add(new Token(TokenType.ESC_NUMBER, lexeme, Integer.valueOf(lexeme), lineNumber));
+                        tokens.add(new Token(
+                                TokenType.ESC_NUMBER, lexeme, Integer.valueOf(lexeme), 
+                                lineNumber, scanIndex - lexeme.length()
+                        ));
                         lexeme = "";
                         state = 0;
                         scanIndex--;
@@ -227,7 +230,10 @@ public class LexicalScanner {
                         state = 18;
                         lexeme += c;
                     } else {
-                        tokens.add(new Token(TokenType.ESC_FLOATING_NUMBER, lexeme, Float.valueOf(lexeme), lineNumber));
+                        tokens.add(new Token(
+                                TokenType.ESC_FLOATING_NUMBER, lexeme, Float.valueOf(lexeme), 
+                                lineNumber, scanIndex - lexeme.length()
+                        ));
                         lexeme = "";
                         state = 0;
                         scanIndex--;
@@ -257,7 +263,10 @@ public class LexicalScanner {
                     if (Character.isDigit(c)) { // state 20
                         lexeme += c;
                     } else {
-                        tokens.add(new Token(TokenType.ESC_DOUBLE_NUMBER, lexeme, Double.valueOf(lexeme), lineNumber));
+                        tokens.add(new Token(
+                                TokenType.ESC_DOUBLE_NUMBER, lexeme, Double.valueOf(lexeme), 
+                                lineNumber, scanIndex - lexeme.length()
+                        ));
                         lexeme = "";
                         state = 0;
                         scanIndex--;
@@ -271,10 +280,10 @@ public class LexicalScanner {
                     } else if (c == '/') {
                         state = 28;
                     } else if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_SLASH_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_SLASH_EQUAL, lineNumber, scanIndex - 1));
                         state = 0;
                     } else { // state 30
-                        tokens.add(new Token(TokenType.ESC_SLASH, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_SLASH, lineNumber, scanIndex));
                         state = 0;
                         scanIndex--;
                     }
@@ -307,9 +316,9 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0;
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_LESS_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_LESS_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_LESS, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_LESS, lineNumber, scanIndex));
                         scanIndex--; 
                     }
                 break;
@@ -318,9 +327,9 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0; 
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_GREATER_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_GREATER_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_GREATER, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_GREATER, lineNumber, scanIndex));
                         scanIndex--; 
                     }
                 break;
@@ -329,9 +338,9 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0; 
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_NOT_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_NOT_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_NOT, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_NOT, lineNumber, scanIndex));
                         scanIndex--; 
                     }
                 break;
@@ -340,9 +349,9 @@ public class LexicalScanner {
                     lexeme = "";
                     state = 0; 
                     if (c == '=') {
-                        tokens.add(new Token(TokenType.ESC_EQUAL_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_EQUAL_EQUAL, lineNumber, scanIndex - 1));
                     } else {
-                        tokens.add(new Token(TokenType.ESC_EQUAL, lineNumber));
+                        tokens.add(new Token(TokenType.ESC_EQUAL, lineNumber, scanIndex));
                         scanIndex--; 
                     }
                 break;
@@ -355,7 +364,7 @@ public class LexicalScanner {
                         lexeme += c;
                     } else if(c == '"') {
                         lexeme += c; 
-                        tokens.add(new Token (TokenType.ESC_STRING, lexeme, myString, lineNumber));
+                        tokens.add(new Token (TokenType.ESC_STRING, lexeme, myString, lineNumber, scanIndex - lexeme.length()));
                         state = 0;
                         lexeme = "";
                         myString = "";

@@ -10,8 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import modeling.Token;
 import modeling.TokenType;
 
@@ -20,7 +18,7 @@ import modeling.TokenType;
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.4-2 (May 26 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.5 (May 28 2025)";
     
     public static final int FILE_NOT_FOUND = 1;
     public static final int INVALID_ESCOMSOLE_CALL = -1;
@@ -37,7 +35,7 @@ public class Interpreter {
      */
     private static int generateTokens(String codeSnippet, int lineNumber) {
         if (codeSnippet == null) {
-            LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1));
+            LexicalScanner.tokens.add(new Token(TokenType.ESC_EOF, "$", -1, -1));
             // System.out.println(LexicalScanner.tokens.get(LexicalScanner.tokens.size() - 1));
             
             if (prevState != 0)
@@ -127,8 +125,10 @@ public class Interpreter {
                 return SyntacticAnalyzerStatus.SYNTAX_ERROR;
             }
             
-            if (SyntacticAnalyzer.getCurrentTokenType() != TokenType.ESC_EOF)
-                return SyntacticAnalyzerStatus.SYNTAX_ERROR;
+            if (SyntacticAnalyzer.getCurrentTokenType() != TokenType.ESC_EOF) {
+                printError(SyntacticAnalyzerStatus.ILLEGAL_TERMINATION);
+                return SyntacticAnalyzerStatus.ILLEGAL_TERMINATION;
+            }
         
             for (String c : code)
                 execute(c);
@@ -249,36 +249,21 @@ public class Interpreter {
             String exp = foundExpected[1].getStrType();
             String foo = foundExpected[0].getRepresentation();
             
+            markerIndex = foundExpected[0].getColumn();
+            
             data = "Syntax error in line " + fileLine;
-            if (!exp.equals("") && !exp.equals(foo)) {
+            if (!exp.equals("") && !exp.equals(foo))
                 data += String.format(", expected '%s' but found '%s'", exp, foo);
-                
-                Token t = SyntacticAnalyzer.getNextToken();
-                String next = t.getRepresentation();
-                
-                // System.out.println("next = " + next);
-                
-                if (!next.equals("")) {
-                    String regex = Pattern.quote(foo) + " *?" + Pattern.quote(next);
-                    
-                    Matcher m = Pattern.compile(regex).matcher(line);
-                    while (m.find()) {
-                        // System.out.println(m.group()); // debug
-                        markerIndex = m.start();
-                    }
-                }
-                
-                if (markerIndex == -1 && !next.equals("")) {
-                    String regex = Pattern.quote(foo);
-                    
-                    Matcher m = Pattern.compile(regex).matcher(line);
-                    while (m.find()) {
-                        // System.out.println(m.group()); // debug
-                        markerIndex = m.start();
-                    }
-                }
-            } else
+            else
                 data += String.format(" near '%s'", foo);
+        } else if (errorCode == SyntacticAnalyzerStatus.ILLEGAL_TERMINATION) {
+            Token foo = foundExpected[0];
+            markerIndex = foo.getColumn();
+            
+            if (foo.getType() == TokenType.ESC_RIGHT_BRACE)
+                data = "Extraneous closing brace in line " + fileLine;
+            else 
+                data = "Syntax error in line " + fileLine + String.format(" near '%s'", foo.getRepresentation());
         }
         
         System.err.println(data);

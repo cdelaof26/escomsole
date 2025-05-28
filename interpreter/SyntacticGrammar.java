@@ -48,7 +48,9 @@ public class SyntacticGrammar {
         // */
         
         
-        rules.put(NonTerminal.PROGRAM, new Object[][]{{NonTerminal.DECLARATION}});
+        rules.put(NonTerminal.PROGRAM, new Object[][]{
+            {NonTerminal.DECLARATION}
+        });
         
         
         
@@ -64,7 +66,9 @@ public class SyntacticGrammar {
             {TokenType.ESC_FUN, TokenType.ESC_IDENTIFIER, TokenType.ESC_LEFT_PAREN, NonTerminal.PARAMETERS, TokenType.ESC_RIGHT_PAREN, NonTerminal.BLOCK}
         });
         
-        rules.put(NonTerminal.VAR_DECL, new Object[][]{{TokenType.ESC_VAR, TokenType.ESC_IDENTIFIER, NonTerminal.VAR_INIT, TokenType.ESC_SEMICOLON}});
+        rules.put(NonTerminal.VAR_DECL, new Object[][]{
+            {TokenType.ESC_VAR, TokenType.ESC_IDENTIFIER, NonTerminal.VAR_INIT, TokenType.ESC_SEMICOLON}
+        });
         
         rules.put(NonTerminal.VAR_INIT, new Object[][]{
             {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION}, 
@@ -117,9 +121,13 @@ public class SyntacticGrammar {
             null
         });
         
-        rules.put(NonTerminal.PRINT_STMT, new Object[][] {{TokenType.ESC_PRINT, NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}});
+        rules.put(NonTerminal.PRINT_STMT, new Object[][] {
+            {TokenType.ESC_PRINT, NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}
+        });
         
-        rules.put(NonTerminal.RETURN_STMT, new Object[][] {{TokenType.ESC_RETURN, NonTerminal.RETURN_EXP_OPC, TokenType.ESC_SEMICOLON}});
+        rules.put(NonTerminal.RETURN_STMT, new Object[][] {
+            {TokenType.ESC_RETURN, NonTerminal.RETURN_EXP_OPC, TokenType.ESC_SEMICOLON}
+        });
         
         rules.put(NonTerminal.RETURN_EXP_OPC, new Object[][] {
             {NonTerminal.EXPRESSION}, 
@@ -130,14 +138,20 @@ public class SyntacticGrammar {
             {TokenType.ESC_WHILE, TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN, NonTerminal.STATEMENT}
         });
         
-        rules.put(NonTerminal.BLOCK, new Object[][] {{TokenType.ESC_LEFT_BRACE, NonTerminal.DECLARATION, TokenType.ESC_RIGHT_BRACE}});
+        rules.put(NonTerminal.BLOCK, new Object[][] {
+            {TokenType.ESC_LEFT_BRACE, NonTerminal.DECLARATION, TokenType.ESC_RIGHT_BRACE}
+        });
         
         
         
         
-        rules.put(NonTerminal.EXPRESSION, new Object[][] {{NonTerminal.ASSIGNMENT}});
+        rules.put(NonTerminal.EXPRESSION, new Object[][] {
+            {NonTerminal.ASSIGNMENT}
+        });
         
-        rules.put(NonTerminal.ASSIGNMENT, new Object[][] {{NonTerminal.LOGIC_OR, NonTerminal.ASSIGNMENT_OPC}});
+        rules.put(NonTerminal.ASSIGNMENT, new Object[][] {
+            {NonTerminal.CONDITIONAL, NonTerminal.ASSIGNMENT_OPC}
+        });
         
         rules.put(NonTerminal.ASSIGNMENT_OPC, new Object[][] {
             {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION},
@@ -151,21 +165,36 @@ public class SyntacticGrammar {
             null
         });
         
-        rules.put(NonTerminal.LOGIC_OR, new Object[][] {{NonTerminal.LOGIC_AND, NonTerminal.LOGIC_OR_P}});
+        rules.put(NonTerminal.CONDITIONAL, new Object[][] {
+            {NonTerminal.LOGIC_OR, NonTerminal.CONDITIONAL_P}
+        });
+        
+        rules.put(NonTerminal.CONDITIONAL_P, new Object[][] {
+            {TokenType.ESC_QUESTION_MARK, NonTerminal.CONDITIONAL, TokenType.ESC_COLON, NonTerminal.CONDITIONAL},
+            null
+        });
+        
+        rules.put(NonTerminal.LOGIC_OR, new Object[][] {
+            {NonTerminal.LOGIC_AND, NonTerminal.LOGIC_OR_P}
+        });
         
         rules.put(NonTerminal.LOGIC_OR_P, new Object[][] {
             {TokenType.ESC_OR, NonTerminal.LOGIC_OR},
             null
         });
         
-        rules.put(NonTerminal.LOGIC_AND, new Object[][] {{NonTerminal.EQUALITY, NonTerminal.LOGIC_AND_P}});
+        rules.put(NonTerminal.LOGIC_AND, new Object[][] {
+            {NonTerminal.EQUALITY, NonTerminal.LOGIC_AND_P}
+        });
         
         rules.put(NonTerminal.LOGIC_AND_P, new Object[][] {
             {TokenType.ESC_AND, NonTerminal.LOGIC_AND},
             null
         });
         
-        rules.put(NonTerminal.EQUALITY, new Object[][] {{NonTerminal.COMPARISON, NonTerminal.EQUALITY_P}});
+        rules.put(NonTerminal.EQUALITY, new Object[][] {
+            {NonTerminal.COMPARISON, NonTerminal.EQUALITY_P}
+        });
         
         rules.put(NonTerminal.EQUALITY_P, new Object[][] {
             {TokenType.ESC_NOT_EQUAL, NonTerminal.EQUALITY},
@@ -173,7 +202,9 @@ public class SyntacticGrammar {
             null
         });
         
-        rules.put(NonTerminal.COMPARISON, new Object[][] {{NonTerminal.TERM, NonTerminal.COMPARISON_P}});
+        rules.put(NonTerminal.COMPARISON, new Object[][] {
+            {NonTerminal.TERM, NonTerminal.COMPARISON_P}
+        });
         
         rules.put(NonTerminal.COMPARISON_P, new Object[][] {
             {TokenType.ESC_GREATER, NonTerminal.COMPARISON},
@@ -183,7 +214,9 @@ public class SyntacticGrammar {
             null
         });
         
-        rules.put(NonTerminal.TERM, new Object[][] {{NonTerminal.FACTOR, NonTerminal.TERM_P}});
+        rules.put(NonTerminal.TERM, new Object[][] {
+            {NonTerminal.FACTOR, NonTerminal.TERM_P}
+        });
         
         rules.put(NonTerminal.TERM_P, new Object[][] {
             {TokenType.ESC_MINUS, NonTerminal.TERM},
@@ -212,25 +245,27 @@ public class SyntacticGrammar {
             {NonTerminal.CALL}
         });
         
-        rules.put(NonTerminal.CALL, new Object[][] {{NonTerminal.PRIMARY, NonTerminal.CALL_P}});
-        
-        
-        // Added feature, support for array notation: "[]", "[v]", "[v, v, ···, v]"
-        // ARRAY -> [ARGUMENTS]
-        rules.put(NonTerminal.ARRAY, new Object[][] {{TokenType.ESC_LEFT_BRACKET, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_BRACKET}});
-        
+        rules.put(NonTerminal.CALL, new Object[][] {
+            {NonTerminal.PRIMARY, NonTerminal.CALL_P}
+        });
         
         rules.put(NonTerminal.CALL_P, new Object[][] {
             {TokenType.ESC_LEFT_PAREN, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_PAREN},
             
             // Added feature, support for array access notation: "a[v]"
-            {NonTerminal.ARRAY},
+            {TokenType.ESC_LEFT_BRACKET, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_BRACKET},
             
             // Added feature, ternary operator: EXPRESSION ? EXPRESSION : EXPRESSION
             // The first expression is already captured
             {TokenType.ESC_QUESTION_MARK, NonTerminal.EXPRESSION, TokenType.ESC_COLON, NonTerminal.EXPRESSION},
             
             null
+        });
+        
+        // Added feature, support for array notation: "[]", "[v]", "[v, v, ···, v]"
+        // ARRAY -> [ARGUMENTS]
+        rules.put(NonTerminal.ARRAY, new Object[][] {
+            {TokenType.ESC_LEFT_BRACKET, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_BRACKET}
         });
         
         rules.put(NonTerminal.PRIMARY, new Object[][] {
@@ -244,7 +279,7 @@ public class SyntacticGrammar {
             {TokenType.ESC_IDENTIFIER},
             {TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN},
             
-            // Added feature, support for array initialization: "var a = [];"
+            // Added feature, support for array initialization: "var a = [1, 2, 3];"
             {NonTerminal.ARRAY}
         });
         

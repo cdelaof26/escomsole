@@ -6,7 +6,7 @@ public class UnaryExpression implements Expression {
     private final Token operator;
     private final Expression rightExpression;
 
-    UnaryExpression(Token operator, Expression rightExpression) {
+    public UnaryExpression(Token operator, Expression rightExpression) {
         this.operator = operator;
         this.rightExpression = rightExpression;
     }

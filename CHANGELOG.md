@@ -1,8 +1,13 @@
 ## Version history
 
+### v0.0.5
+- Implemented modeling expressions and statements
+- Improved error printing logic
+- Reintroduced "only identifiers are callable"
+
 ### v0.0.4-2
 - Rewritten syntax analyzer
-- Removed generic syntax analyzer
+    - Removed generic syntax analyzer
 - Added modeling expressions and statements
 
 ### v0.0.4-1

@@ -21,18 +21,21 @@ public class Token {
     private final String lexeme;
     private final Object literal;
     private final int line;
+    private final int column;
 
     /**
      * Constructs a token given a type and a lexeme
      * 
      * @param type the type
      * @param line the line in which the token was found
+     * @param column the starting column of this token
      */
-    public Token(TokenType type, int line) {
+    public Token(TokenType type, int line, int column) {
         this.type = type;
         this.lexeme = null;
         this.literal = null;
         this.line = line;
+        this.column = column;
     }
     
     /**
@@ -40,12 +43,14 @@ public class Token {
      * @param type the type
      * @param lexeme the lexeme
      * @param line the line in which the token was found
+     * @param column the starting column of this token
      */
-    public Token(TokenType type, String lexeme, int line) {
+    public Token(TokenType type, String lexeme, int line, int column) {
         this.type = type;
         this.lexeme = lexeme;
         this.literal = null;
         this.line = line;
+        this.column = column;
     }
     
     /**
@@ -55,12 +60,14 @@ public class Token {
      * @param lexeme the lexeme
      * @param literal the literal
      * @param line the line in which the token was found
+     * @param column the starting column of this token
      */
-    public Token(TokenType type, String lexeme, Object literal, int line) {
+    public Token(TokenType type, String lexeme, Object literal, int line, int column) {
         this.type = type;
         this.lexeme = lexeme;
         this.literal = literal;
         this.line = line;
+        this.column = column;
     }
 
     public TokenType getType() {
@@ -87,6 +94,10 @@ public class Token {
         return line;
     }
 
+    public int getColumn() {
+        return column;
+    }
+
     @Override
     public String toString() {
         String data = "<";
@@ -101,6 +112,9 @@ public class Token {
         
         if (line != -1)
             data += ", Line: " + line;
+        
+        if (column != -1)
+            data += ", Column: " + column;
         
         data += ">";
         
