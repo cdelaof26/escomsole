@@ -1,214 +1,224 @@
 package modeling;
+
 import java.util.HashMap;
 
 public class GramaticalRules {
-  public static HashMap<NoTerminales, Object[][]> Rules = new HashMap<>();
+    public static HashMap<NonTerminal, Object[][]> rules = new HashMap<>();
 
-  static {
-    Rules.put(NoTerminales.PROGRAM, new Object[][] {
-        { NoTerminales.DECLARATION }
+    static {
+    rules.put(NonTerminal.PROGRAM, new Object[][]{{NonTerminal.DECLARATION}});
+        
+    rules.put(NonTerminal.DECLARATION, new Object[][]{
+        {NonTerminal.FUN_DECL, NonTerminal.DECLARATION},
+        {NonTerminal.VAR_DECL, NonTerminal.DECLARATION},
+        {NonTerminal.STATEMENT, NonTerminal.DECLARATION},
+        null
     });
+        
+        rules.put(NonTerminal.FUN_DECL, new Object[][]{
+            {TokenType.ESC_FUN, TokenType.ESC_IDENTIFIER, TokenType.ESC_LEFT_PAREN, NonTerminal.PARAMETERS, TokenType.ESC_RIGHT_PAREN, NonTerminal.BLOCK}
+        });
+        
+        rules.put(NonTerminal.VAR_DECL, new Object[][]{{TokenType.ESC_VAR, TokenType.ESC_IDENTIFIER, NonTerminal.VAR_INIT, TokenType.ESC_SEMICOLON}});
+        
+        rules.put(NonTerminal.VAR_INIT, new Object[][]{
+            {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION}, 
+            null
+        });
 
-    Rules.put(NoTerminales.DECLARATION, new Object[][] {
-        { NoTerminales.FUN_DECL, NoTerminales.DECLARATION },
-        { NoTerminales.VAR_DECL, NoTerminales.DECLARATION },
-        { NoTerminales.STATEMENT, NoTerminales.DECLARATION },
-        { null }
-    });
-
-    Rules.put(NoTerminales.FUN_DECL, new Object[][] {
-        {TokenType.ESC_FUN, TokenType.ESC_IDENTIFIER, TokenType.ESC_LEFT_PAREN, NoTerminales.PARAMETERS, TokenType.ESC_RIGHT_PAREN, NoTerminales.BLOCK}
-    });
-
-    Rules.put(NoTerminales.VAR_DECL, new Object[][] {
-        {TokenType.ESC_VAR, TokenType.ESC_IDENTIFIER, NoTerminales.VAR_INIT, TokenType.ESC_SEMICOLON}
-    });
-
-    Rules.put(NoTerminales.VAR_INIT, new Object[][] {
-        { TokenType.ESC_EQUAL, NoTerminales.EXPRESSION },
-        { null }
-    });
-
-    Rules.put(NoTerminales.STATEMENT, new Object[][] {
-        { NoTerminales.EXPR_STMT },
-        { NoTerminales.FOR_STMT },
-        { NoTerminales.IF_STMT },
-        { NoTerminales.PRINT_STMT },
-        { NoTerminales.RETURN_STMT },
-        { NoTerminales.WHILE_STMT },
-        { NoTerminales.BLOCK },
-    });
-
-    Rules.put(NoTerminales.EXPR_STMT, new Object[][] {
-        { NoTerminales.EXPRESSION, TokenType.ESC_SEMICOLON }
-    });
-
-    Rules.put(NoTerminales.FOR_STMT, new Object[][] {
-        {TokenType.ESC_FOR, TokenType.ESC_LEFT_PAREN, NoTerminales.FOR_STMT_INIT, NoTerminales.FOR_STMT_COND, NoTerminales.FOR_STMT_INC, TokenType.ESC_RIGHT_PAREN, NoTerminales.STATEMENT}
-    });
-
-    Rules.put(NoTerminales.FOR_STMT_INIT, new Object[][] {
-        { NoTerminales.VAR_DECL },
-        { NoTerminales.EXPR_STMT },
-        { TokenType.ESC_SEMICOLON }
-    });
-
-    Rules.put(NoTerminales.FOR_STMT_COND, new Object[][] {
-        { NoTerminales.EXPRESSION },
-        { TokenType.ESC_SEMICOLON }
-    });
-
-    Rules.put(NoTerminales.FOR_STMT_INC, new Object[][] {
-        { NoTerminales.EXPRESSION },
-        { null }
-    });
-
-    Rules.put(NoTerminales.IF_STMT, new Object[][] {
-        { TokenType.ESC_IF, TokenType.ESC_LEFT_PAREN, NoTerminales.EXPRESSION, TokenType.ESC_RIGHT_PAREN, NoTerminales.STATEMENT, NoTerminales.ELSE_STATEMENT }
-    });
-
-    Rules.put(NoTerminales.ELSE_STATEMENT, new Object[][] {
-        { TokenType.ESC_ELSE, NoTerminales.STATEMENT },
-        { null }
-    });
-
-    Rules.put(NoTerminales.PRINT_STMT, new Object[][] {
-        { TokenType.ESC_PRINT, NoTerminales.EXPRESSION, TokenType.ESC_SEMICOLON }
-    });
-
-    Rules.put(NoTerminales.RETURN_STMT, new Object[][] {
-        { TokenType.ESC_RETURN, NoTerminales.RETURN_EXP_OPC, TokenType.ESC_SEMICOLON }
-    });
-
-    Rules.put(NoTerminales.RETURN_EXP_OPC, new Object[][] {
-        { NoTerminales.EXPRESSION },
-        { null }
-    });
-
-    Rules.put(NoTerminales.WHILE_STMT, new Object[][] {
-        { TokenType.ESC_WHILE, TokenType.ESC_LEFT_PAREN, NoTerminales.EXPRESSION, TokenType.ESC_RIGHT_PAREN, NoTerminales.STATEMENT }
-    });
-
-    Rules.put(NoTerminales.BLOCK, new Object[][] {
-        { TokenType.ESC_LEFT_BRACE, NoTerminales.DECLARATION, TokenType.ESC_RIGHT_BRACE }
-    });
-
-    Rules.put(NoTerminales.EXPRESSION, new Object[][] {
-        { NoTerminales.ASSIGNMENT }
-    });
-
-    Rules.put(NoTerminales.ASSIGNMENT, new Object[][] {
-        { NoTerminales.LOGIC_OR, NoTerminales.ASSIGNMENT_OPC }
-    });
-
-    Rules.put(NoTerminales.ASSIGNMENT_OPC, new Object[][] {
-        { TokenType.ESC_EQUAL, NoTerminales.EXPRESSION },
-        { null }
-    });
-
-    Rules.put(NoTerminales.LOGIC_OR, new Object[][] {
-        { NoTerminales.LOGIC_AND, NoTerminales.LOGIC_OR_P },
-    });
-
-    Rules.put(NoTerminales.LOGIC_OR_P, new Object[][] {
-        { TokenType.ESC_OR, NoTerminales.LOGIC_OR},
-        { null }
-    });
-
-    Rules.put(NoTerminales.LOGIC_AND, new Object[][] {
-        { NoTerminales.EQUALITY, NoTerminales.LOGIC_AND_P },
-    });
-
-    Rules.put(NoTerminales.LOGIC_AND_P, new Object[][] {
-      { TokenType.ESC_AND, NoTerminales.LOGIC_AND},
-      { null}
-    });
-
-    Rules.put(NoTerminales.EQUALITY, new Object[][] {
-      { NoTerminales.COMPARISON, NoTerminales.EQUALITY_P },
-    });
-
-    Rules.put(NoTerminales.EQUALITY_P, new Object[][] {
-      { TokenType.ESC_NOT_EQUAL, NoTerminales.EQUALITY },
-      { TokenType.ESC_EQUAL_EQUAL, NoTerminales.EQUALITY },
-      { null }
-    });
-
-    Rules.put(NoTerminales.COMPARISON, new Object[][] {
-      {NoTerminales.TERM, NoTerminales.COMPARISON_P },
-    });
-
-    Rules.put(NoTerminales.COMPARISON_P, new Object[][] {
-      { TokenType.ESC_GREATER, NoTerminales.COMPARISON },
-      { TokenType.ESC_GREATER_EQUAL, NoTerminales.COMPARISON },
-      { TokenType.ESC_LESS, NoTerminales.COMPARISON },
-      { TokenType.ESC_LESS_EQUAL, NoTerminales.COMPARISON },
-      { null },
-    });
-
-    Rules.put(NoTerminales.TERM, new Object[][] {
-      { NoTerminales.FACTOR, NoTerminales.TERM_P }
-    });
-
-    Rules.put(NoTerminales.TERM_P, new Object[][] {
-      { TokenType.ESC_MINUS, NoTerminales.TERM },
-      { TokenType.ESC_PLUS, NoTerminales.TERM },
-      { null }
-    });
-
-    Rules.put(NoTerminales.FACTOR, new Object[][] {
-      { NoTerminales.UNARY, NoTerminales.FACTOR_P }
-    });
-
-    Rules.put(NoTerminales.FACTOR_P, new Object[][] {
-      { TokenType.ESC_SLASH, NoTerminales.FACTOR },
-      { TokenType.ESC_STAR, NoTerminales.FACTOR },
-      { null }
-    });
-
-    Rules.put(NoTerminales.UNARY, new Object[][] {
-      { TokenType.ESC_NOT, NoTerminales.UNARY },
-      { TokenType.ESC_MINUS, NoTerminales.UNARY },
-      { NoTerminales.CALL}
-    });
-
-    Rules.put(NoTerminales.CALL, new Object[][] {
-      { NoTerminales.PRIMARY, NoTerminales.CALL_P }
-    });
-
-    Rules.put(NoTerminales.CALL_P, new Object[][] {
-      { TokenType.ESC_LEFT_PAREN, NoTerminales.ARGUMENTS, TokenType.ESC_RIGHT_PAREN },
-      { null }
-    });
-
-    Rules.put(NoTerminales.PRIMARY, new Object[][] {
-        { TokenType.ESC_TRUE },
-        { TokenType.ESC_FALSE },
-        { TokenType.ESC_NULL },
-        { TokenType.ESC_NUMBER },
-        { TokenType.ESC_STRING },
-        { TokenType.ESC_IDENTIFIER },
-        { TokenType.ESC_LEFT_PAREN, NoTerminales.EXPRESSION, TokenType.ESC_RIGHT_PAREN }
-    });
-
-    Rules.put(NoTerminales.PARAMETERS, new Object[][] {
-      { TokenType.ESC_IDENTIFIER, NoTerminales.PARAMETERS_P },
-      { null }
-    });
-
-    Rules.put(NoTerminales.PARAMETERS_P, new Object[][] {
-      { TokenType.ESC_COMMA, TokenType.ESC_IDENTIFIER, NoTerminales.PARAMETERS_P },
-      { null }
-    });
-
-    Rules.put(NoTerminales.ARGUMENTS, new Object[][] {
-      { NoTerminales.EXPRESSION, NoTerminales.ARGUMENTS_P },
-      { null }
-    });
-
-    Rules.put(NoTerminales.ARGUMENTS_P, new Object[][] {
-      { TokenType.ESC_COMMA, NoTerminales.EXPRESSION, NoTerminales.ARGUMENTS_P },
-      { null }
-    });
+        
+        rules.put(NonTerminal.STATEMENT, new Object[][]{
+            {NonTerminal.EXPR_STMT}, 
+            {NonTerminal.FOR_STMT}, 
+            {NonTerminal.IF_STMT}, 
+            {NonTerminal.PRINT_STMT}, 
+            {NonTerminal.RETURN_STMT}, 
+            {NonTerminal.WHILE_STMT}, 
+            {NonTerminal.BLOCK}
+        });
+        
+        rules.put(NonTerminal.EXPR_STMT, new Object[][] {
+            {NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}
+        });
+        
+        rules.put(NonTerminal.FOR_STMT, new Object[][] {
+            {TokenType.ESC_FOR, TokenType.ESC_LEFT_PAREN, NonTerminal.FOR_STMT_INIT, NonTerminal.FOR_STMT_COND, NonTerminal.FOR_STMT_INC, TokenType.ESC_RIGHT_PAREN, NonTerminal.STATEMENT}
+        });
+        
+        rules.put(NonTerminal.FOR_STMT_INIT, new Object[][] {
+            {NonTerminal.VAR_DECL},
+            {NonTerminal.EXPR_STMT},
+            {TokenType.ESC_SEMICOLON}
+        });
+        
+        rules.put(NonTerminal.FOR_STMT_COND, new Object[][] {
+            {NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON},
+            {TokenType.ESC_SEMICOLON}
+        });
+        
+        rules.put(NonTerminal.FOR_STMT_INC, new Object[][] {
+            {NonTerminal.EXPRESSION},
+            null
+        });
+        
+        rules.put(NonTerminal.IF_STMT, new Object[][] {
+            {TokenType.ESC_IF, TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN, NonTerminal.STATEMENT, NonTerminal.ELSE_STATEMENT}
+        });
+        
+        rules.put(NonTerminal.ELSE_STATEMENT, new Object[][] {
+            {TokenType.ESC_ELSE, NonTerminal.STATEMENT}, 
+            null
+        });
+        
+        rules.put(NonTerminal.PRINT_STMT, new Object[][] {{TokenType.ESC_PRINT, NonTerminal.EXPRESSION, TokenType.ESC_SEMICOLON}});
+        
+        rules.put(NonTerminal.RETURN_STMT, new Object[][] {{TokenType.ESC_RETURN, NonTerminal.RETURN_EXP_OPC, TokenType.ESC_SEMICOLON}});
+        
+        rules.put(NonTerminal.RETURN_EXP_OPC, new Object[][] {
+            {NonTerminal.EXPRESSION}, 
+            null
+        });
+        
+        rules.put(NonTerminal.WHILE_STMT, new Object[][] {
+            {TokenType.ESC_WHILE, TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN, NonTerminal.STATEMENT}
+        });
+        
+        rules.put(NonTerminal.BLOCK, new Object[][] {{TokenType.ESC_LEFT_BRACE, NonTerminal.DECLARATION, TokenType.ESC_RIGHT_BRACE}});
+        
+        rules.put(NonTerminal.EXPRESSION, new Object[][] {{NonTerminal.ASSIGNMENT}});
+        
+        rules.put(NonTerminal.ASSIGNMENT, new Object[][] {{NonTerminal.LOGIC_OR, NonTerminal.ASSIGNMENT_OPC}});
+        
+        rules.put(NonTerminal.ASSIGNMENT_OPC, new Object[][] {
+            {TokenType.ESC_EQUAL, NonTerminal.EXPRESSION},
+            
+            // Added feature, +=, -=, *= and /= operators
+            {TokenType.ESC_STAR_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_SLASH_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_PLUS_EQUAL, NonTerminal.EXPRESSION}, 
+            {TokenType.ESC_MINUS_EQUAL, NonTerminal.EXPRESSION}, 
+            
+            null
+        });
+        
+        rules.put(NonTerminal.LOGIC_OR, new Object[][] {{NonTerminal.LOGIC_AND, NonTerminal.LOGIC_OR_P}});
+        
+        rules.put(NonTerminal.LOGIC_OR_P, new Object[][] {
+            {TokenType.ESC_OR, NonTerminal.LOGIC_OR},
+            null
+        });
+        
+        rules.put(NonTerminal.LOGIC_AND, new Object[][] {{NonTerminal.EQUALITY, NonTerminal.LOGIC_AND_P}});
+        
+        rules.put(NonTerminal.LOGIC_AND_P, new Object[][] {
+            {TokenType.ESC_AND, NonTerminal.LOGIC_AND},
+            null
+        });
+        
+        rules.put(NonTerminal.EQUALITY, new Object[][] {{NonTerminal.COMPARISON, NonTerminal.EQUALITY_P}});
+        
+        rules.put(NonTerminal.EQUALITY_P, new Object[][] {
+            {TokenType.ESC_NOT_EQUAL, NonTerminal.EQUALITY},
+            {TokenType.ESC_EQUAL_EQUAL, NonTerminal.EQUALITY},
+            null
+        });
+        
+        rules.put(NonTerminal.COMPARISON, new Object[][] {{NonTerminal.TERM, NonTerminal.COMPARISON_P}});
+        
+        rules.put(NonTerminal.COMPARISON_P, new Object[][] {
+            {TokenType.ESC_GREATER, NonTerminal.COMPARISON},
+            {TokenType.ESC_GREATER_EQUAL, NonTerminal.COMPARISON},
+            {TokenType.ESC_LESS, NonTerminal.COMPARISON},
+            {TokenType.ESC_LESS_EQUAL, NonTerminal.COMPARISON},
+            null
+        });
+        
+        rules.put(NonTerminal.TERM, new Object[][] {{NonTerminal.FACTOR, NonTerminal.TERM_P}});
+        
+        rules.put(NonTerminal.TERM_P, new Object[][] {
+            {TokenType.ESC_MINUS, NonTerminal.TERM},
+            {TokenType.ESC_PLUS, NonTerminal.TERM},
+            
+            // Added feature: ++ and -- operators
+            {TokenType.ESC_MINUS_MINUS},
+            {TokenType.ESC_PLUS_PLUS},
+            
+            null
+        });
+        
+        rules.put(NonTerminal.FACTOR, new Object[][] {
+            {NonTerminal.UNARY, NonTerminal.FACTOR_P}
+        });
+        
+        rules.put(NonTerminal.FACTOR_P, new Object[][] {
+            {TokenType.ESC_SLASH, NonTerminal.FACTOR},
+            {TokenType.ESC_STAR, NonTerminal.FACTOR},
+            null
+        });
+        
+        rules.put(NonTerminal.UNARY, new Object[][] {
+            {TokenType.ESC_NOT, NonTerminal.UNARY},
+            {TokenType.ESC_MINUS, NonTerminal.UNARY},
+            {NonTerminal.CALL}
+        });
+        
+        rules.put(NonTerminal.CALL, new Object[][] {{NonTerminal.PRIMARY, NonTerminal.CALL_P}});
+        
+        
+        // Added feature, support for array notation: "[]", "[v]", "[v, v, ···, v]"
+        // ARRAY -> [ARGUMENTS]
+        rules.put(NonTerminal.ARRAY, new Object[][] {{TokenType.ESC_LEFT_BRACKET, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_BRACKET}});
+        
+        
+        rules.put(NonTerminal.CALL_P, new Object[][] {
+            {TokenType.ESC_LEFT_PAREN, NonTerminal.ARGUMENTS, TokenType.ESC_RIGHT_PAREN},
+            
+            // Added feature, support for array access notation: "a[v]"
+            {NonTerminal.ARRAY},
+            
+            // Added feature, ternary operator: EXPRESSION ? EXPRESSION : EXPRESSION
+            // The first expression is already captured
+            {TokenType.ESC_QUESTION_MARK, NonTerminal.EXPRESSION, TokenType.ESC_COLON, NonTerminal.EXPRESSION},
+            
+            null
+        });
+        
+        rules.put(NonTerminal.PRIMARY, new Object[][] {
+            {TokenType.ESC_TRUE},
+            {TokenType.ESC_FALSE},
+            {TokenType.ESC_NULL},
+            {TokenType.ESC_NUMBER},
+            {TokenType.ESC_FLOATING_NUMBER},
+            {TokenType.ESC_DOUBLE_NUMBER},
+            {TokenType.ESC_STRING},
+            {TokenType.ESC_IDENTIFIER},
+            {TokenType.ESC_LEFT_PAREN, NonTerminal.EXPRESSION, TokenType.ESC_RIGHT_PAREN},
+            
+            // Added feature, support for array initialization: "var a = [];"
+            {NonTerminal.ARRAY}
+        });
+        
+        
+        
+        
+        rules.put(NonTerminal.PARAMETERS, new Object[][] {
+            {TokenType.ESC_IDENTIFIER, NonTerminal.PARAMETERS_P},
+            null
+        });
+        
+        rules.put(NonTerminal.PARAMETERS_P, new Object[][] {
+            {TokenType.ESC_COMMA, TokenType.ESC_IDENTIFIER, NonTerminal.PARAMETERS_P},
+            null
+        });
+        
+        rules.put(NonTerminal.ARGUMENTS, new Object[][] {
+            {NonTerminal.EXPRESSION, NonTerminal.ARGUMENTS_P},
+            null
+        });
+        
+        rules.put(NonTerminal.ARGUMENTS_P, new Object[][] {
+            {TokenType.ESC_COMMA, NonTerminal.EXPRESSION, NonTerminal.ARGUMENTS_P},
+            null
+        });
   }
 }
