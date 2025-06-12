@@ -2,10 +2,9 @@ package modeling.parser.statements;
 
 import java.util.List;
 
-public class StatementBlock implements Statement {
-    private final List<Statement> statements;
-
-    public StatementBlock(List<Statement> statements) {
-        this.statements = statements;
+public record StatementBlock(List<Statement> statements) implements Statement {
+    @Override
+    public <T> T accept(VisitorStatement<T> visitor) {
+        return visitor.visitStatementBlock(this);
     }
 }

@@ -1,9 +1,8 @@
 package modeling.parser.expressions;
 
-public class LiteralExpression implements Expression {
-    private final Object value;
-
-    public LiteralExpression(Object value) {
-        this.value = value;
+public record LiteralExpression(Object value) implements Expression {
+    @Override
+    public <T> T accept(VisitorExpression<T> visitor) {
+        return visitor.visitLiteralExpression(this);
     }
 }

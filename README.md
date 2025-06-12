@@ -3,7 +3,7 @@
 REPL written in Java FTW
 
 ### Requirements
-- Java 8 or newer
+- Java 17 or newer
 
 ### Compile
 

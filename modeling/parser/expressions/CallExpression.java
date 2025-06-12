@@ -2,12 +2,9 @@ package modeling.parser.expressions;
 
 import java.util.List;
 
-public class CallExpression implements Expression {
-    private final Expression symbol;
-    private final List<Expression> arguments;
-
-    public CallExpression(Expression symbol, List<Expression> arguments) {
-        this.symbol = symbol;
-        this.arguments = arguments;
+public record CallExpression(Expression symbol, List<Expression> arguments) implements Expression {
+    @Override
+    public <T> T accept(VisitorExpression<T> visitor) {
+        return visitor.visitCallExpression(this);
     }
 }

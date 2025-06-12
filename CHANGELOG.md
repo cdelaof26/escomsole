@@ -1,5 +1,9 @@
 ## Version history
 
+### v0.0.6
+- Implemented first execute file logic
+  - Still needs some work
+
 ### v0.0.5
 - Implemented modeling expressions and statements
 - Improved error printing logic

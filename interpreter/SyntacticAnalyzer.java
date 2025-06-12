@@ -12,9 +12,11 @@ import modeling.parser.expressions.CallExpression;
 import modeling.parser.expressions.Expression;
 import modeling.parser.expressions.GroupingExpression;
 import modeling.parser.expressions.LiteralExpression;
+import modeling.parser.expressions.Identifier;
 import modeling.parser.expressions.LogicalExpression;
 import modeling.parser.expressions.RelationalExpression;
 import modeling.parser.expressions.TernaryExpression;
+import modeling.parser.expressions.UnaryExpression;
 import modeling.parser.statements.ExpressionStatement;
 import modeling.parser.statements.FunctionStatement;
 import modeling.parser.statements.IfStatement;
@@ -207,7 +209,7 @@ public class SyntacticAnalyzer {
             body = new StatementBlock(Arrays.asList(body, increment));
                 
         if (condition == null)
-            condition = new LiteralExpression("true");
+            condition = new LiteralExpression(true);
         
         LoopStatement loopStatement = new LoopStatement(condition, body);
         
@@ -335,7 +337,7 @@ public class SyntacticAnalyzer {
         if (rightExpression == null)
             return leftExpression;
         
-        return new AssignmentExpression(name, operator, leftExpression);
+        return new AssignmentExpression(name, operator, rightExpression);
     }
     
     private static Expression ASSIGNMENT_OPC() {
@@ -470,24 +472,34 @@ public class SyntacticAnalyzer {
         Expression leftExpression = FACTOR();
         
         Token operator = getCurrentToken();
-        Expression rightExpression = TERM_P();
+        Expression rightExpression = TERM_P(leftExpression);
+        
+        if (rightExpression instanceof UnaryExpression)
+            return rightExpression;
+        
         if (rightExpression == null)
             return leftExpression;
         
         return new ArithmeticExpression(leftExpression, operator, rightExpression);
     }
 
-    private static Expression TERM_P() {
-        switch (getCurrentTokenType()) {
+    private static Expression TERM_P(Expression leftExpression) {
+        Token t = getCurrentToken();
+        if (t == null)
+            throwError();
+        
+        switch (t.getType()) {
             case ESC_MINUS:
             case ESC_PLUS:
-                match(getCurrentTokenType());
+                match(t.getType());
             return TERM();
             
             case ESC_MINUS_MINUS:
             case ESC_PLUS_PLUS:
-                match(getCurrentTokenType());
-            break;
+                // In text, it'll be scanned as identifier++
+                // however, will be converted into ++identifier
+                match(t.getType());
+            return new UnaryExpression(t, leftExpression);
         }
         
         // Can be epsilon
@@ -578,6 +590,8 @@ public class SyntacticAnalyzer {
     }
 
     private static Expression PRIMARY() {
+        Token t;
+        
         switch (getCurrentTokenType()) {
             case ESC_TRUE:
             case ESC_FALSE:
@@ -586,10 +600,14 @@ public class SyntacticAnalyzer {
             case ESC_FLOATING_NUMBER:
             case ESC_DOUBLE_NUMBER:
             case ESC_STRING:
-            case ESC_IDENTIFIER:
-                Token t = getCurrentToken();
+                t = getCurrentToken();
                 match(t.getType());
             return new LiteralExpression(t.getLiteral());
+            
+            case ESC_IDENTIFIER:
+                t = getCurrentToken();
+                match(t.getType());
+            return new LiteralExpression(new Identifier((String) t.getLiteral()));
             
             case ESC_LEFT_PAREN:
                 match(getCurrentTokenType());

@@ -13,7 +13,7 @@ public class LexicalScanner {
         "and", "else", "false", "fun", "for", "if", "null", "or",
         "print", "return", "true", "var", "while"
     };
-
+    
     private static final ArrayList<Character> SYMBOLS = new ArrayList<>();
     private static final ArrayList<TokenType> SYMBOLS_TOKEN_TYPES = new ArrayList();
 

@@ -2,10 +2,9 @@ package modeling.parser.expressions;
 
 import modeling.Token;
 
-public class VariableExpression implements Expression {
-    private final Token name;
-
-    public VariableExpression(Token name) {
-        this.name = name;
+public record VariableExpression(Token name) implements Expression {
+    @Override
+    public <T> T accept(VisitorExpression<T> visitor) {
+        return visitor.visitVariableExpression(this);
     }
 }

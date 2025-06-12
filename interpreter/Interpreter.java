@@ -1,5 +1,6 @@
 package interpreter;
 
+import interpreter.core.VisitorImplementationInterpreter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,13 +13,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import modeling.Token;
 import modeling.TokenType;
+import modeling.parser.statements.Statement;
 
 /**
  *
  * @author cristopher
  */
 public class Interpreter {
-    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.5 (May 28 2025)";
+    public static final String ESCOMSOLE_VERSION = "escomsoleJE v0.0.6 (Jun 12 2025)";
     
     public static final int FILE_NOT_FOUND = 1;
     public static final int INVALID_ESCOMSOLE_CALL = -1;
@@ -62,13 +64,18 @@ public class Interpreter {
         return status;
     }
     
+    private static final VisitorImplementationInterpreter interpreter = new VisitorImplementationInterpreter();
+    
     /**
      * Given a line of code, this function executes it
      * 
-     * @param codeSnippet the code to run
+     * @param code the code to run
      * @return the status code
      */
-    public static int execute(String codeSnippet) {
+    public static int execute(ArrayList<Statement> code) {
+        for (Statement s : code)
+            interpreter.evaluate(s);
+        
         return 0;
     }
     
@@ -118,8 +125,11 @@ public class Interpreter {
         }
         
         if (exitCode == LexicalScannerStatus.RUN_SUCCESS) {
+            ArrayList<Statement> output;
+                    
             try {
-                SyntacticAnalyzer.PROGRAM();
+                output = SyntacticAnalyzer.PROGRAM();
+//                System.out.println("stmts = " + stmts);
             } catch (IllegalStateException ex) {
                 printError(SyntacticAnalyzerStatus.SYNTAX_ERROR);
                 return SyntacticAnalyzerStatus.SYNTAX_ERROR;
@@ -130,8 +140,7 @@ public class Interpreter {
                 return SyntacticAnalyzerStatus.ILLEGAL_TERMINATION;
             }
         
-            for (String c : code)
-                execute(c);
+            exitCode = execute(output);
         }
 
         return exitCode;
@@ -176,9 +185,9 @@ public class Interpreter {
                 
                 code.add(fileLine);
                 
-                
+                ArrayList<Statement> output;
                 try {
-                    SyntacticAnalyzer.PROGRAM();
+                    output = SyntacticAnalyzer.PROGRAM();
                     SyntacticAnalyzer.setAnalysisTokenIndex(LexicalScanner.tokens.size());
                 } catch (IllegalStateException ex) {
 //                    ex.printStackTrace();
@@ -188,8 +197,8 @@ public class Interpreter {
                     continue;
                 }
 
-                execute(fileLine);
-                System.out.println("Valid program");
+                execute(output);
+//                System.out.println("Valid program");
                 lineNumber++;
             }
         }

@@ -33,7 +33,19 @@ public class Token {
     public Token(TokenType type, int line, int column) {
         this.type = type;
         this.lexeme = null;
-        this.literal = null;
+        
+        switch (type) {
+            case ESC_TRUE:
+                this.literal = true;
+            break;
+            case ESC_FALSE:
+                this.literal = false;
+            break;
+            default:
+                this.literal = null;
+            break;
+        }
+        
         this.line = line;
         this.column = column;
     }

@@ -2,12 +2,9 @@ package modeling.parser.expressions;
 
 import modeling.Token;
 
-public class UnaryExpression implements Expression {
-    private final Token operator;
-    private final Expression rightExpression;
-
-    public UnaryExpression(Token operator, Expression rightExpression) {
-        this.operator = operator;
-        this.rightExpression = rightExpression;
+public record UnaryExpression(Token operator, Expression rightExpression) implements Expression {
+    @Override
+    public <T> T accept(VisitorExpression<T> visitor) {
+        return visitor.visitUnaryExpression(this);
     }
 }
