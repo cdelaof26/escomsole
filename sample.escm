@@ -1,7 +1,7 @@
 /*
     This is a sample snippet for the
     escomsole interpreter written
-    in C.
+    in Java.
 */
 
 fun functionWithNoParameters() {
@@ -47,6 +47,6 @@ myVar2--;
 myVar += 12;
 myVar2 *= 9.9;
 
-print myVar and myBooleanVar;
+print myVar > 10 and myBooleanVar;
 print myBooleanVar ? myVar : myVar2;
 print myBooleanVar ? myVar : comparison ? myVar2 : myArray;

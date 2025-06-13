@@ -1,5 +1,13 @@
 ## Version history
 
+### v0.0.6-1
+- Fixed broken unary expressions
+- Fixed `ArithmeticExpression` doing operations with swapped operands
+- Fixed incorrect array type
+    - Implementation might change to use Map instead of ArrayList
+- Implemented function definition, function calls and return statements [WIP]
+- Changed CRLF files to LF
+
 ### v0.0.6
 - Implemented first execute file logic
   - Still needs some work

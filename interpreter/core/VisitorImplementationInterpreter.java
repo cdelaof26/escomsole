@@ -3,7 +3,9 @@ package interpreter.core;
 import modeling.parser.statements.VisitorStatement;
 import modeling.parser.expressions.VisitorExpression;
 import interpreter.exception.RuntimeError;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import modeling.Token;
 import modeling.TokenType;
@@ -56,14 +58,6 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
 
     @Override
     public Object visitArithmeticExpression(ArithmeticExpression expression) {
-        Object rightResult = evaluate(expression.rightExpression());
-        if (rightResult instanceof Identifier right)
-            rightResult = environment.get(right.value());
-        
-        if (!(rightResult instanceof Number right))
-            throw new RuntimeError(rightResult, "Operand must be numeric");
-        
-        
         Object leftResult = evaluate(expression.leftExpression());
         if (leftResult instanceof Identifier left)
             leftResult = environment.get(left.value());
@@ -72,25 +66,33 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
             throw new RuntimeError(leftResult, "Operand must be numeric");
         
         
+        Object rightResult = evaluate(expression.rightExpression());
+        if (rightResult instanceof Identifier right)
+            rightResult = environment.get(right.value());
+        
+        if (!(rightResult instanceof Number right))
+            throw new RuntimeError(rightResult, "Operand must be numeric");
+        
+        
         TokenType type = expression.operator().getType();
         
         Object result;
         if (right instanceof Double || left instanceof Double) {
-            result = type == TokenType.ESC_MINUS ? right.doubleValue() - left.doubleValue() :
-                    type == TokenType.ESC_PLUS ? right.doubleValue() + left.doubleValue() :
-                    type == TokenType.ESC_SLASH ? right.doubleValue() / left.doubleValue() :
-                    type == TokenType.ESC_STAR ? right.doubleValue() * left.doubleValue() : null;
+            result = type == TokenType.ESC_MINUS ? left.doubleValue() - right.doubleValue() :
+                    type == TokenType.ESC_PLUS ? left.doubleValue() + right.doubleValue() :
+                    type == TokenType.ESC_SLASH ? left.doubleValue() / right.doubleValue() :
+                    type == TokenType.ESC_STAR ? left.doubleValue() * right.doubleValue() : null;
             
         } else if (right instanceof Float || left instanceof Float) {
-            result = type == TokenType.ESC_MINUS ? right.floatValue()- left.floatValue() :
-                    type == TokenType.ESC_PLUS ? right.floatValue() + left.floatValue() :
-                    type == TokenType.ESC_SLASH ? right.floatValue() / left.floatValue() :
-                    type == TokenType.ESC_STAR ? right.floatValue() * left.floatValue() : null;
+            result = type == TokenType.ESC_MINUS ? left.floatValue()- right.floatValue() :
+                    type == TokenType.ESC_PLUS ? left.floatValue() + right.floatValue() :
+                    type == TokenType.ESC_SLASH ? left.floatValue() / right.floatValue() :
+                    type == TokenType.ESC_STAR ? left.floatValue() * right.floatValue() : null;
         } else {
-            result = type == TokenType.ESC_MINUS ? right.intValue() - left.intValue() :
-                    type == TokenType.ESC_PLUS ? right.intValue() + left.intValue() :
-                    type == TokenType.ESC_SLASH ? right.intValue() / left.intValue() :
-                    type == TokenType.ESC_STAR ? right.intValue() * left.intValue() : null;
+            result = type == TokenType.ESC_MINUS ? left.intValue() - right.intValue() :
+                    type == TokenType.ESC_PLUS ? left.intValue() + right.intValue() :
+                    type == TokenType.ESC_SLASH ? left.intValue() / right.intValue() :
+                    type == TokenType.ESC_STAR ? left.intValue() * right.intValue() : null;
         }
         
         if (result != null)
@@ -108,27 +110,33 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
         if (!(symbolResult instanceof Identifier symbolLSE))
             throw new RuntimeError(expression.symbol(), "Expression is not callable");
         
-        Object array = environment.get(symbolLSE.value());
-        if (!(array instanceof Map map))
-            throw new RuntimeError(array, "Object is not an array");
+        Object value = environment.get(symbolLSE.value());
+        if (!(value instanceof List array))
+            throw new RuntimeError(value, "Object is not an array");
         
         
         Object argument = evaluate(expression.arguments());
         if (argument instanceof Integer index) {
-            if (!map.containsKey(index))
+            if (array.size() < index)
                 return null;
             
-            return map.get(index);
+            if (array.get(index) instanceof LiteralExpression le)
+                return le.value();
+            
+            return array.get(index);
         }
         
         if (!(argument instanceof Identifier argumentLSE))
             throw new RuntimeError(argument, "Array index must be an identifier or Integer");
         
         if (environment.get(argumentLSE.value()) instanceof Integer index) {
-            if (!map.containsKey(index))
+            if (array.size() < index)
                 return null;
 
-            return map.get(index);
+            if (array.get(index) instanceof LiteralExpression le)
+                return le.value();
+            
+            return array.get(index);
         }
 
         throw new RuntimeError(argumentLSE.value(), "Identifier is not an Integer");
@@ -143,6 +151,8 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
         
         String identifier = expression.name().getLexeme();
         Object result = evaluate(expression.value());
+        if (result instanceof Identifier id)
+            result = environment.get(id.value());
         
         if (expression.operator().getType() == TokenType.ESC_EQUAL) {
             environment.assign(identifier, result);
@@ -180,7 +190,34 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
 
     @Override
     public Object visitCallExpression(CallExpression expression) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object symbolResult = evaluate(expression.symbol());
+        
+        if (!(symbolResult instanceof Identifier identifier))
+            throw new RuntimeError(symbolResult, "Object is not callable");
+        
+        Object [] data = environment.getFunction(identifier.value());
+        List<Token> parameters = (List<Token>) data[0];
+        StatementBlock body = (StatementBlock) data[1];
+        
+        int args = expression.arguments().size();
+        int params = parameters.size();
+        if (args != params)
+            throw new RuntimeError(
+                expression.arguments(), 
+                String.format("%s expected %d argument(s) but %d were given", identifier.value(), params, args)
+            );
+        
+        List<VariableStatement> arguments = new ArrayList<>();
+        for (int i = 0; i < args; i++)
+            arguments.add(new VariableStatement(parameters.get(i), expression.arguments().get(i)));
+        
+        // System.out.println("arguments = " + arguments);
+        body.setInitVariables(arguments);
+        // body.setAutoCloseScope(false);
+        
+        evaluate(body);
+        
+        return globals.getReturnValue();
     }
 
     @Override
@@ -327,12 +364,36 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
 
     @Override
     public Void visitStatementBlock(StatementBlock statement) {
-        Environment prev = environment;
         environment = new Environment(environment);
-        for (Statement s : statement.statements())
-            evaluate(s);
         
-        environment = prev;
+        if (statement.hasInitVariables()) {
+            for (VariableStatement vs : statement.getInitVariables())
+                evaluate(vs);
+            
+            // System.out.println("environment.getValues() = " + environment.getValues());
+        }
+        
+        for (Statement s : statement.statements()) {
+            evaluate(s);
+            
+//            System.out.println("globals.getBreakStack() = " + globals.getBreakStack());
+            if (globals.shouldBreakStack()) {
+                statement.setAutoCloseScope(false);
+                break;
+            }
+            
+            if (s instanceof ReturnStatement) {
+                statement.setAutoCloseScope(false);
+                globals.incrBreakStack();
+//                System.out.println("break " + s);
+                break;
+            }
+        }
+        
+        if (statement.isAutoCloseScopeActive())
+            environment = environment.getEnclosing();
+        
+//        System.out.println("exit " + statement.getInitVariables());
         return null;
     }
 
@@ -344,7 +405,15 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
 
     @Override
     public Void visitFunctionStatement(FunctionStatement statement) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        environment.defineFunction(
+            (String) statement.name().getLiteral(), 
+            new Object[] {
+                statement.params(),
+                statement.body()
+            }
+        );
+        
+        return null;
     }
 
     @Override
@@ -396,14 +465,27 @@ public class VisitorImplementationInterpreter implements VisitorExpression<Objec
 
     @Override
     public Void visitReturnStatement(ReturnStatement statement) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object result = evaluate(statement.value());
+        if (result instanceof Identifier identifier)
+            result = environment.get(identifier.value());
+        
+        globals.addReturnValue(result);
+        
+        // Close environment
+//        System.out.println("environment.getValues() = " + environment.getValues());
+        environment = environment.getEnclosing();
+//        System.out.println("globals.returnValues() = " + globals.getReturnValues());
+        
+        return null;
     }
 
     @Override
     public Void visitVariableStatement(VariableStatement statement) {
+        Object ini = statement.initializer() == null ? null : evaluate(statement.initializer());
+        
         environment.define(
-                (String) statement.name().getLiteral(), 
-                statement.initializer() == null ? null : evaluate(statement.initializer())
+            (String) statement.name().getLiteral(), 
+            ini
         );
         
         return null;

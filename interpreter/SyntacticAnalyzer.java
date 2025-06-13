@@ -2,6 +2,7 @@ package interpreter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import modeling.NonTerminal;
 import modeling.Token;
 import modeling.TokenType;
@@ -507,7 +508,20 @@ public class SyntacticAnalyzer {
     }
 
     private static Expression FACTOR() {
-        Expression leftExpression = UNARY();
+        Object left = UNARY(null);
+        
+        Expression leftExpression = null;
+        LinkedList<Token> wrapUnaryList = null;
+        
+        if (left instanceof Object[] l) {
+            leftExpression = (Expression) l[0];
+            wrapUnaryList = (LinkedList<Token>) l[1];
+        } else {
+            throwError(); // This should never happen
+        }
+        
+        while (!wrapUnaryList.isEmpty())
+            leftExpression = new UnaryExpression(wrapUnaryList.pollLast(), leftExpression);
         
         Token operator = getCurrentToken();
         Expression rightExpression = FACTOR_P();
@@ -529,15 +543,27 @@ public class SyntacticAnalyzer {
         return null;
     }
 
-    private static Expression UNARY() {
-        switch (getCurrentTokenType()) {
+    private static Object UNARY(LinkedList<Token> wrapUnaryList) {
+        if (wrapUnaryList == null)
+            wrapUnaryList = new LinkedList<>();
+        
+        Token t = getCurrentToken();
+        
+        switch (t.getType()) {
+            // Unary wasn't creating the UnaryExpressions, resulting in 
+            // incorrect interpretations. A workaround is been implemented: 
+            //  It consists in defining a list with all the applied operators 
+            //  to then, wrap the final result with those starting with the 
+            //  last operator.
+            //
             case ESC_NOT:
             case ESC_MINUS:
-                match(getCurrentTokenType());
-            return UNARY();
+                match(t.getType());
+                wrapUnaryList.add(t);
+            return UNARY(wrapUnaryList);
             
             default:
-            return CALL();
+            return new Object[] { CALL(), wrapUnaryList };
         }
     }
 
@@ -566,22 +592,11 @@ public class SyntacticAnalyzer {
                 match(TokenType.ESC_RIGHT_PAREN);
             return new CallExpression(rightExpression, arguments);
             
-//            case ESC_QUESTION_MARK:
-//                match(getCurrentTokenType());
-//                Statement thenBranch = STATEMENT();
-//                match(TokenType.ESC_COLON);
-//                Statement elseBranch = STATEMENT();
-//            return new TernaryExpression(rightExpression, thenBranch, elseBranch);
-            
             case ESC_LEFT_BRACKET:
                 match(getCurrentTokenType());
                 Expression expression = EXPRESSION();
                 match(TokenType.ESC_RIGHT_BRACKET);
             return new ArrayCallExpression(rightExpression, expression);
-                
-//                ArrayList<Object> firstARRAY = SyntacticGrammar.first(NonTerminal.ARRAY);
-//                if (firstARRAY.contains(getCurrentTokenType()))
-//                    return ARRAY();
             
         }
         

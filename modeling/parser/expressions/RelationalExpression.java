@@ -7,5 +7,4 @@ public record RelationalExpression(Expression leftExpression, Token operator, Ex
     public <T> T accept(VisitorExpression<T> visitor) {
         return visitor.visitRelationalExpression(this);
     }
-
 }
